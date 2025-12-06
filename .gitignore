@@ -28,3 +28,4 @@ coverage/
 
 # Private docs (not for public repo)
 PUBLISHING.md
+bun.lock
