@@ -207,12 +207,20 @@ This package includes a powerful CLI for publishing OTA updates with version tra
 
 ### Quick Start
 
+**In your project (recommended):**
 ```bash
-# Initialize config
-npx ota-publish init
-
-# Publish update
+# When installed in your project, just use:
 npx ota-publish --channel production
+```
+
+**Global usage:**
+```bash
+# If running outside a project, specify the package:
+npx -p @ddedic/expo-fancy-ota-updates ota-publish --channel production
+
+# Or install globally:
+npm install -g @ddedic/expo-fancy-ota-updates
+ota-publish --channel production
 ```
 
 ### Using in Your App
