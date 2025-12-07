@@ -42,6 +42,8 @@ A highly customizable OTA (Over-The-Air) update UI package for Expo apps. Includ
 
 ## ✨ Features
 
+### UI Components
+
 - 🎨 **Fully Customizable** — Theme colors, gradients, border radius, and animations
 - 🌍 **i18n Ready** — Pass your own translations or use English defaults
 - ✨ **Animated Banner** — Beautiful gradient banner with pulse animation
@@ -49,6 +51,59 @@ A highly customizable OTA (Over-The-Air) update UI package for Expo apps. Includ
 - 🔌 **Drop-in Ready** — Works out of the box with sensible defaults
 - 🎯 **Render Props** — Override any component with your own implementation
 - 🎨 **Icon Support** — Uses lucide-react-native with text fallbacks
+
+### CLI Publishing Tool
+
+- 🚀 **Easy Publishing** — Simple `ota-publish` command to publish OTA updates
+- ⚙️ **Configurable** — Customize via `ota-updates.config.js`
+- 📊 **Multiple Version Strategies** — Semver, build number, or date-based
+- 📝 **Smart Changelog** — Auto-generate from git, manual input, or file
+- 🎯 **Interactive Mode** — Guided prompts for easy publishing
+- 🔍 **Dry Run** — Preview changes before publishing
+- 🪝 **Hooks System** — Run custom logic before/after publish
+- 📦 **Multi-Channel** — Support for dev, preview, production channels
+
+---
+
+## 📸 Screenshots
+
+<div align="center">
+
+### UI Components in Action
+
+<table>
+<tr>
+<td width="33%" align="center">
+  <img src="./assets/screenshots/screenshot-1.PNG" alt="Update Banner" width="100%" />
+  <br/>
+  <sub><b>Animated Update Banner</b></sub>
+  <br/>
+  <sub>Beautiful gradient with pulse animation</sub>
+</td>
+<td width="33%" align="center">
+  <img src="./assets/screenshots/screenshot-2.PNG" alt="Download Progress" width="100%" />
+  <br/>
+  <sub><b>Download Progress</b></sub>
+  <br/>
+  <sub>Real-time download status</sub>
+</td>
+<td width="33%" align="center">
+  <img src="./assets/screenshots/screenshot-3.PNG" alt="OTA Info Screen" width="100%" />
+  <br/>
+  <sub><b>OTA Info Screen</b></sub>
+  <br/>
+  <sub>Full debug & version details</sub>
+</td>
+</tr>
+</table>
+
+### CLI Publishing Tool
+
+<img src="./assets/screenshots/cli-screenshot.png" alt="CLI Tool" width="80%" />
+
+<sub><b>Interactive CLI</b> — Publish OTA updates with guided prompts, version tracking, and changelog generation</sub>
+
+</div>
 
 ---
 
@@ -124,6 +179,46 @@ export default function App() {
 ```
 
 That's it! The banner will automatically appear when an OTA update is detected.
+
+---
+
+## 🚀 CLI Publishing Tool
+
+This package includes a powerful CLI for publishing OTA updates with version tracking.
+
+### Quick Start
+
+```bash
+# Initialize config
+npx ota-publish init
+
+# Publish update
+npx ota-publish --channel production
+```
+
+### Using in Your App
+
+**After publishing to npm:**
+```bash
+npx ota-publish --channel development
+```
+
+**For local development (before npm publish):**
+
+Add to your `package.json`:
+```json
+{
+  "scripts": {
+    "ota:dev": "node node_modules/@ddedic/expo-fancy-ota-updates/bin/ota-publish.js --channel development",
+    "ota:preview": "node node_modules/@ddedic/expo-fancy-ota-updates/bin/ota-publish.js --channel preview",
+    "ota:prod": "node node_modules/@ddedic/expo-fancy-ota-updates/bin/ota-publish.js --channel production"
+  }
+}
+```
+
+Then run: `npm run ota:dev`, `npm run ota:preview`, or `npm run ota:prod`
+
+**📖 [Full CLI Documentation →](./CLI.md)**
 
 ---
 
