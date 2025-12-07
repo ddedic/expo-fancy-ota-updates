@@ -23,9 +23,24 @@ yarn-error.log*
 # Test coverage
 coverage/
 
-# Misc
-*.tgz
+# Build output
+dist/
+*.tsbuildinfo
 
-# Private docs (not for public repo)
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+
+# Docs
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+
+# Publishing
 PUBLISHING.md
 bun.lock
+
+# Misc
+*.tgz
