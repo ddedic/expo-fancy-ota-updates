@@ -2,8 +2,13 @@
 
 A highly customizable OTA (Over-The-Air) update UI package for Expo apps. Includes animated banners, info screens, and full theming support.
 
+
 [![npm version](https://img.shields.io/npm/v/@ddedic/expo-fancy-ota-updates.svg)](https://www.npmjs.com/package/@ddedic/expo-fancy-ota-updates)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Documentation](https://img.shields.io/badge/docs-vitepress-blue.svg)](https://ddedic.github.io/expo-fancy-ota-updates/)
+
+**[📚 Full Documentation](https://ddedic.github.io/expo-fancy-ota-updates/)** | **[📦 npm Package](https://www.npmjs.com/package/@ddedic/expo-fancy-ota-updates)** | **[💻 GitHub](https://github.com/ddedic/expo-fancy-ota-updates)**
+
 
 ---
 
