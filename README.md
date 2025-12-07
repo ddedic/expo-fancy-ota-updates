@@ -187,6 +187,20 @@ That's it! The banner will automatically appear when an OTA update is detected.
 
 ---
 
+## 📚 Documentation
+
+**[📖 View Full Documentation →](https://ddedic.github.io/expo-fancy-ota-updates/)**
+
+Comprehensive documentation with guides, examples, and API reference:
+
+- **[Getting Started](https://ddedic.github.io/expo-fancy-ota-updates/getting-started)** — Quick setup guide
+- **[UI Components](https://ddedic.github.io/expo-fancy-ota-updates/ui-components/provider)** — Provider, Banner, Info Screen, Hook
+- **[CLI Tool](https://ddedic.github.io/expo-fancy-ota-updates/cli/overview)** — Publishing commands and configuration
+- **[Guides](https://ddedic.github.io/expo-fancy-ota-updates/guides/theming)** — Theming, i18n, Hooks
+- **[Examples](https://ddedic.github.io/expo-fancy-ota-updates/examples/workflow)** — Complete workflows and custom UI
+
+---
+
 ## 🚀 CLI Publishing Tool
 
 This package includes a powerful CLI for publishing OTA updates with version tracking.
