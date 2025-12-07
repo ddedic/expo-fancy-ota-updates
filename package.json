@@ -12,6 +12,9 @@
   "bugs": {
     "url": "https://github.com/ddedic/expo-fancy-ota-updates/issues"
   },
+  "bin": {
+    "ota-publish": "./bin/ota-publish.js"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
