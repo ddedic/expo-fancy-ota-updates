@@ -12,6 +12,43 @@ hero:
     - theme: alt
       text: View on GitHub
       link: https://github.com/ddedic/expo-fancy-ota-updates
+
+features:
+  - icon: 🎨
+    title: Fully Customizable
+    details: Theme colors, gradients, border radius, and animations. Make it match your brand perfectly.
+  
+  - icon: 🌍
+    title: i18n Ready
+    details: Built-in support for multiple languages. Pass your own translations or use English defaults.
+  
+  - icon: ✨
+    title: Animated Banner
+    details: Beautiful gradient banner with pulse animation that appears when updates are available.
+  
+  - icon: 📱
+    title: Info Screen
+    details: Full debug/info screen with changelog display, version details, and manual update controls.
+  
+  - icon: 🚀
+    title: CLI Publishing Tool
+    details: Powerful command-line tool for publishing OTA updates with version tracking and changelog generation.
+  
+  - icon: 📊
+    title: Version Strategies
+    details: Choose from semver, build number, or date-based versioning strategies.
+  
+  - icon: 📝
+    title: Smart Changelog
+    details: Auto-generate changelogs from git commits, manual input, or files.
+  
+  - icon: 🪝
+    title: Hooks System
+    details: Run custom logic before/after publishing with a flexible hooks system.
+  
+  - icon: 🎯
+    title: Render Props
+    details: Override any component with your own implementation using render props.
 ---
 
 <div style="text-align: center; margin: 3rem 0; padding: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px;">
@@ -56,46 +93,6 @@ hero:
   <p style="margin-top: 1rem; font-weight: 600; font-size: 1.1rem;">Interactive CLI Publishing Tool</p>
   <p style="color: #666;">Publish OTA updates with guided prompts, version tracking, and changelog generation</p>
 </div>
-
----
-
-features:
-  - icon: 🎨
-    title: Fully Customizable
-    details: Theme colors, gradients, border radius, and animations. Make it match your brand perfectly.
-  
-  - icon: 🌍
-    title: i18n Ready
-    details: Built-in support for multiple languages. Pass your own translations or use English defaults.
-  
-  - icon: ✨
-    title: Animated Banner
-    details: Beautiful gradient banner with pulse animation that appears when updates are available.
-  
-  - icon: 📱
-    title: Info Screen
-    details: Full debug/info screen with changelog display, version details, and manual update controls.
-  
-  - icon: 🚀
-    title: CLI Publishing Tool
-    details: Powerful command-line tool for publishing OTA updates with version tracking and changelog generation.
-  
-  - icon: 📊
-    title: Version Strategies
-    details: Choose from semver, build number, or date-based versioning strategies.
-  
-  - icon: 📝
-    title: Smart Changelog
-    details: Auto-generate changelogs from git commits, manual input, or files.
-  
-  - icon: 🪝
-    title: Hooks System
-    details: Run custom logic before/after publishing with a flexible hooks system.
-  
-  - icon: 🎯
-    title: Render Props
-    details: Override any component with your own implementation using render props.
----
 
 ## Quick Example
 
