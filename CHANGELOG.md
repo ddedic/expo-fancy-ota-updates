@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2025-12-08
+
+### Added
+- **Modular Info Screen**: Completely refactored `OTAInfoScreen` to support custom render functions (`renderInfo`, `renderActions`, `renderChangelog`) and exported sub-components (`OTAUpdateInfo`, `OTAUpdateActions`, `OTAUpdateChangelog`) for full flexibility.
+- **Improved Feedback**: Added immediate visual alerts for "Check for Update" actions (Success, Up to Date, Error, Skipped).
+- **Enhanced UI**: Implemented a modern card-based layout with grouped information sections and distinct action buttons.
+
+### Changed
+- **Layout**: Moved "Actions" and "Debug" sections above the "What's New" changelog for better accessibility without scrolling.
+- **Visuals**: improved spacing and hierarchy; added distinct separation for the changelog section.
+
+### Fixed
+- Fixed missing `downloading` state in `UpdateStatus` type definition.
+
 ## [1.1.5] - 2025-12-07
 
 ### Fixed

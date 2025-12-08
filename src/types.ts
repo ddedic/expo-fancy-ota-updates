@@ -15,6 +15,15 @@ export type UpdateStatus =
   | 'downloaded' 
   | 'error';
 
+export interface CheckResult {
+  isAvailable: boolean;
+  status: UpdateStatus;
+  isSkipped?: boolean;
+  reason?: string;
+  error?: Error;
+  manifest?: any;
+}
+
 // ============================================================================
 // Theme Configuration
 // ============================================================================
@@ -195,7 +204,7 @@ export interface OTAUpdatesContextValue {
   otaChangelog: string[];
   
   // Actions
-  checkForUpdate: () => Promise<void>;
+  checkForUpdate: () => Promise<CheckResult>;
   downloadUpdate: () => Promise<void>;
   reloadApp: () => Promise<void>;
   /** Simulate update banner for testing (shows banner, resets on dismiss) */
@@ -252,6 +261,13 @@ export interface OTAInfoScreenProps {
   onBack?: () => void;
   /** Custom style for the container */
   style?: object;
+  
+  /** Custom render function for the base info section (Status + Version Info) */
+  renderInfo?: (props: { theme: OTATheme }) => React.ReactNode;
+  /** Custom render function for the actions section (Buttons + Debug) */
+  renderActions?: (props: { theme: OTATheme }) => React.ReactNode;
+  /** Custom render function for the changelog section */
+  renderChangelog?: (props: { theme: OTATheme }) => React.ReactNode;
   
   // Mode configuration
   /** 

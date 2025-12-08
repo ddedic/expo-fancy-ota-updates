@@ -2,7 +2,12 @@
 export { OTAUpdatesProvider } from './context/OTAUpdatesProvider';
 export { useOTAUpdates } from './context/OTAUpdatesProvider';
 export { UpdateBanner } from './components/UpdateBanner';
-export { OTAInfoScreen } from './components/OTAInfoScreen';
+export { 
+  OTAInfoScreen,
+  OTAUpdateInfo,
+  OTAUpdateActions,
+  OTAUpdateChangelog 
+} from './components/OTAInfoScreen';
 
 // Export types
 export type {
