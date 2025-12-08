@@ -419,23 +419,53 @@ Full debug/info screen for OTA updates. Great for settings or debug menus.
 
 #### Props
 
+#### Props
+
 | Prop | Type | Description |
 |------|------|-------------|
+| `mode` | `'developer' \| 'user'` | Screen mode (default: 'developer') |
 | `onBack` | `() => void` | Back navigation callback |
-| `hideDebug` | `boolean` | Hide debug section (default: false) |
-| `style` | `object` | Custom container style |
 | `renderHeader` | `(props) => ReactNode` | Custom header render |
+| `renderInfo` | `(props) => ReactNode` | Custom render for Info section |
+| `renderActions` | `(props) => ReactNode` | Custom render for Actions section |
+| `renderChangelog` | `(props) => ReactNode` | Custom render for Changelog section |
+| `showRuntimeVersion` | `boolean` | Toggle runtime version visibility |
+| `showOtaVersion` | `boolean` | Toggle OTA version visibility |
+| `showReleaseDate` | `boolean` | Toggle release date visibility |
+| `showUpdateId` | `boolean` | Toggle update ID visibility |
+| `showCheckButton` | `boolean` | Toggle "Check for Updates" button |
+| `showDownloadButton` | `boolean` | Toggle "Download" button |
+| `showReloadButton` | `boolean` | Toggle "Reload" button |
+| `showDebugSection` | `boolean` | Toggle debug actions section |
+| `style` | `object` | Custom container style |
 
 #### Usage
 
 ```tsx
 import { OTAInfoScreen } from '@ddedic/expo-fancy-ota-updates';
 
-// In your settings or debug screen
+// Simple usage
 <OTAInfoScreen 
+  mode="user"
   onBack={() => navigation.goBack()} 
-  hideDebug={!__DEV__}
 />
+
+// Advanced usage with custom sections
+<OTAInfoScreen
+  renderInfo={({ theme }) => (
+    <View style={{ padding: 20 }}>
+      <Text style={{ color: theme.colors.text }}>My Custom Header</Text>
+    </View>
+  )}
+/>
+```
+
+#### Sub-Components
+
+You can also import sub-components directly if you want to compose your own screen:
+
+```tsx
+import { OTAUpdateInfo, OTAUpdateActions, OTAUpdateChangelog } from '@ddedic/expo-fancy-ota-updates';
 ```
 
 ---

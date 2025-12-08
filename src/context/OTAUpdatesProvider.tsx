@@ -14,6 +14,7 @@ import type {
   UpdateStatus,
   OTATheme,
   OTATranslations,
+  CheckResult,
 } from '../types';
 import { 
   mergeTheme, 
@@ -69,15 +70,15 @@ export function OTAUpdatesProvider({
   // Actions
   // ============================================================================
 
-  const checkForUpdate = useCallback(async () => {
+  const checkForUpdate = useCallback(async (): Promise<CheckResult> => {
     if (__DEV__) {
       log('Skipping update check in DEV mode');
-      return;
+      return { isAvailable: false, status: 'idle', isSkipped: true, reason: 'DEV mode' };
     }
 
     if (!Device.isDevice) {
       log('Skipping update check in simulator mode');
-      return;
+      return { isAvailable: false, status: 'idle', isSkipped: true, reason: 'Simulator mode' };
     }
 
     try {
@@ -97,15 +98,18 @@ export function OTAUpdatesProvider({
           log('Auto-downloading update...');
           await downloadUpdate();
         }
+        return { isAvailable: true, status: 'available', manifest: update.manifest };
       } else {
         log('No update available');
         setIsUpdateAvailable(false);
         setStatus('idle');
+        return { isAvailable: false, status: 'idle' };
       }
     } catch (error) {
       console.error('[OTA] Error checking for updates:', error);
       setCheckError(error as Error);
       setStatus('error');
+      return { isAvailable: false, status: 'error', error: error as Error };
     }
   }, [autoDownload, log]);
 
