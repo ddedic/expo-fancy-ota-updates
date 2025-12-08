@@ -26,8 +26,22 @@ import type { OTAInfoScreenProps } from '../types';
 export function OTAInfoScreen({ 
   renderHeader,
   onBack,
-  hideDebug = false,
   style,
+  // Mode configuration
+  mode = 'developer',
+  // Visibility configuration - use explicit values or compute from mode
+  showRuntimeVersion,
+  showOtaVersion,
+  showReleaseDate,
+  showUpdateId,
+  showChannel,
+  showChangelog,
+  showCheckButton,
+  showDownloadButton,
+  showReloadButton,
+  showDebugSection,
+  // Deprecated prop
+  hideDebug,
 }: OTAInfoScreenProps = {}) {
   const insets = useSafeAreaInsets();
   
@@ -44,6 +58,8 @@ export function OTAInfoScreen({
     currentUpdateId,
     isEmbeddedUpdate,
     simulateUpdate,
+    isSimulating,
+    resetSimulation,
     otaVersion,
     otaBuildNumber,
     otaReleaseDate,
@@ -54,6 +70,25 @@ export function OTAInfoScreen({
 
   const { colors, borderRadius } = theme;
   const { infoScreen: t } = translations;
+
+  // Compute visibility based on mode and explicit props
+  // Developer mode: show everything by default
+  // User mode: hide debug section and update ID by default
+  const isUserMode = mode === 'user';
+  
+  const visibility = {
+    runtimeVersion: showRuntimeVersion ?? true,
+    otaVersion: showOtaVersion ?? true,
+    releaseDate: showReleaseDate ?? true,
+    updateId: showUpdateId ?? !isUserMode, // Hidden in user mode by default
+    channel: showChannel ?? true,
+    changelog: showChangelog ?? true,
+    checkButton: showCheckButton ?? true,
+    downloadButton: showDownloadButton ?? true,
+    reloadButton: showReloadButton ?? true,
+    // Debug section: respect deprecated hideDebug or new showDebugSection, default hidden in user mode
+    debugSection: showDebugSection ?? (hideDebug !== undefined ? !hideDebug : !isUserMode),
+  };
 
   // Format date
   const formattedDate = otaReleaseDate 
@@ -88,9 +123,11 @@ export function OTAInfoScreen({
           )}
           <View style={styles.headerCenter}>
             <Text style={[styles.headerTitle, { color: colors.text }]}>{t.title}</Text>
-            <Text style={[styles.headerSubtitle, { color: colors.textTertiary }]}>
-              {channel ? `${t.channel}: ${channel}` : `${t.channel}: default`}
-            </Text>
+            {visibility.channel && (
+              <Text style={[styles.headerSubtitle, { color: colors.textTertiary }]}>
+                {channel ? `${t.channel}: ${channel}` : `${t.channel}: default`}
+              </Text>
+            )}
           </View>
           <View style={{ width: 40 }} />
         </View>
@@ -124,38 +161,51 @@ export function OTAInfoScreen({
 
           {/* Version Info */}
           <View style={styles.infoSection}>
-            <InfoRow 
-              label={t.runtimeVersion} 
-              value={runtimeVersion ?? t.notAvailable} 
-              colors={colors} 
-            />
-            <InfoRow 
-              label={t.otaVersion} 
-              value={`${otaVersion} (${otaBuildNumber})`} 
-              colors={colors} 
-            />
-            <InfoRow 
-              label={t.releaseDate} 
-              value={formattedDate} 
-              colors={colors} 
-            />
-            <InfoRow 
-              label={t.updateId} 
-              value={truncatedUpdateId} 
-              colors={colors}
-              isMonospace
-            />
+            {visibility.runtimeVersion && (
+              <InfoRow 
+                label={t.runtimeVersion} 
+                value={runtimeVersion ?? t.notAvailable} 
+                colors={colors} 
+              />
+            )}
+            {visibility.otaVersion && (
+              <InfoRow 
+                label={t.otaVersion} 
+                value={`${otaVersion} (${otaBuildNumber})`} 
+                colors={colors} 
+              />
+            )}
+            {visibility.releaseDate && (
+              <InfoRow 
+                label={t.releaseDate} 
+                value={formattedDate} 
+                colors={colors} 
+              />
+            )}
+            {visibility.updateId && (
+              <InfoRow 
+                label={t.updateId} 
+                value={truncatedUpdateId} 
+                colors={colors}
+                isMonospace
+              />
+            )}
           </View>
 
           {/* Changelog */}
-          {otaChangelog.length > 0 && (
-            <View style={[styles.changelogContainer, { backgroundColor: colors.backgroundTertiary, borderRadius: borderRadius ?? 16 - 4 }]}>
+          {visibility.changelog && otaChangelog.length > 0 && (
+            <View style={[styles.changelogContainer, { backgroundColor: colors.backgroundTertiary, borderRadius: (borderRadius ?? 16) - 4 }]}>
               <Text style={[styles.changelogTitle, { color: colors.text }]}>{t.whatsNew}</Text>
-              {otaChangelog.map((log: string, index: number) => (
-                <Text key={index} style={[styles.changelogItem, { color: colors.textSecondary }]}>
-                  • {log}
-                </Text>
-              ))}
+              <View style={styles.changelogList}>
+                {otaChangelog.map((log: string, index: number) => (
+                  <View key={index} style={styles.changelogRow}>
+                    <View style={[styles.changelogBullet, { backgroundColor: colors.primary }]} />
+                    <Text style={[styles.changelogItemText, { color: colors.textSecondary }]}>
+                      {log}
+                    </Text>
+                  </View>
+                ))}
+              </View>
             </View>
           )}
 
@@ -175,21 +225,23 @@ export function OTAInfoScreen({
           )}
 
           {/* Actions */}
-          <View style={styles.actionRow}>
-            <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: colors.backgroundTertiary, borderRadius: borderRadius ?? 12 }]}
-              onPress={() => checkForUpdate()}
-              disabled={isDownloading}
-              activeOpacity={0.7}
-            >
-              <RefreshIcon size={16} color={colors.text} />
-              <Text style={[styles.actionButtonText, { color: colors.text }]}>
-                {t.checkForUpdates}
-              </Text>
-            </TouchableOpacity>
-          </View>
+          {visibility.checkButton && (
+            <View style={styles.actionRow}>
+              <TouchableOpacity
+                style={[styles.actionButton, { backgroundColor: colors.backgroundTertiary, borderRadius: borderRadius ?? 12 }]}
+                onPress={() => checkForUpdate()}
+                disabled={isDownloading}
+                activeOpacity={0.7}
+              >
+                <RefreshIcon size={16} color={colors.text} />
+                <Text style={[styles.actionButtonText, { color: colors.text }]}>
+                  {t.checkForUpdates}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
-          {isUpdateAvailable && !isDownloaded && (
+          {visibility.downloadButton && isUpdateAvailable && !isDownloaded && (
             <View style={styles.actionRow}>
               <TouchableOpacity
                 style={[styles.actionButton, { backgroundColor: colors.primary + '20', borderRadius: borderRadius ?? 12 }]}
@@ -205,7 +257,7 @@ export function OTAInfoScreen({
             </View>
           )}
 
-          {isDownloaded && (
+          {visibility.reloadButton && isDownloaded && (
             <View style={styles.actionRow}>
               <TouchableOpacity
                 style={[styles.actionButton, { backgroundColor: colors.success + '20', borderRadius: borderRadius ?? 12 }]}
@@ -221,17 +273,17 @@ export function OTAInfoScreen({
           )}
 
           {/* Debug Actions */}
-          {!hideDebug && (
+          {visibility.debugSection && (
             <View style={[styles.debugSection, { borderTopColor: colors.border }]}>
               <Text style={[styles.debugTitle, { color: colors.textSecondary }]}>{t.debugTitle}</Text>
               <TouchableOpacity
                 style={[styles.actionButton, { backgroundColor: colors.backgroundTertiary, borderRadius: borderRadius ?? 12 }]}
-                onPress={() => simulateUpdate()}
+                onPress={() => isSimulating ? resetSimulation() : simulateUpdate()}
                 activeOpacity={0.7}
               >
                 <DownloadIcon size={16} color={colors.text} />
                 <Text style={[styles.actionButtonText, { color: colors.text }]}>
-                  {t.simulateUpdate}
+                  {isSimulating ? t.hideSimulation : t.simulateUpdate}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -338,12 +390,31 @@ const styles = StyleSheet.create({
   
   changelogContainer: {
     padding: 16,
-    gap: 6,
+    gap: 8,
   },
   changelogTitle: {
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 4,
+  },
+  changelogList: {
+    gap: 8,
+  },
+  changelogRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+  },
+  changelogBullet: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginTop: 6,
+  },
+  changelogItemText: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 18,
   },
   changelogItem: {
     fontSize: 13,
