@@ -14,32 +14,55 @@ A highly customizable OTA (Over-The-Air) update UI package for Expo apps. Includ
 
 <div align="center">
 
-### 🏆 Proudly Used In
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td align="center" style="border: 1px solid #30363d; border-radius: 12px; padding: 20px; background-color: #0d1117; color: #c9d1d9;">
+
+<br/>
+<h3 style="margin-bottom: 10px; border: none; color: #c9d1d9;">🏆 Proudly Used In</h3>
 
 <a href="https://www.photo-trim.com">
-  <img src="./assets/photo-trim-icon.png" alt="Photo Trim" width="80" height="80" style="border-radius: 16px;" />
+<img src="./assets/photo-trim-icon.png" alt="Photo Trim" width="90" style="border-radius: 20px;" />
 </a>
 
-## **[Photo Trim — Smart Photo Library Cleaner](https://www.photo-trim.com)**
+<h2 style="margin-top: 15px; margin-bottom: 5px; border: none;">
+<a href="https://www.photo-trim.com" style="text-decoration: none; color: #58a6ff;">Photo Trim — Smart Photo Library Cleaner</a>
+</h2>
 
-*See exactly what's eating your storage — and fix it in seconds*
+<p style="font-size: 16px; margin: 10px 0; color: #8b949e; font-style: italic;">
+See exactly what's eating your storage — and fix it in seconds
+</p>
 
-**Photo Trim** gives you complete visibility into your photo library clutter. Discover large files, old media, and forgotten videos buried in both your device and iCloud. Smart grouping and powerful filters make it effortless to identify and delete unnecessary photos and videos — reclaiming gigabytes of storage with just a few taps.
+<p width="85%" style="color: #8b949e; max-width: 600px; margin: 15px auto; line-height: 1.5;">
+<strong>Photo Trim</strong> gives you complete visibility into your photo library clutter. Discover large files, old media, and forgotten videos buried in both your device and iCloud. Smart grouping and powerful filters make it effortless to identify and delete unnecessary photos and videos — reclaiming gigabytes of storage with just a few taps.
+</p>
 
-<table>
+<br/>
+
+<table border="0" align="center" width="100%" style="margin: 0 auto; max-width: 700px; border-collapse: separate; border-spacing: 10px;">
 <tr>
-<td align="center">📊<br/><b>Storage Insights</b><br/><sub>See what's cluttering device & iCloud</sub></td>
-<td align="center">�<br/><b>Sort by Size</b><br/><sub>Find large photos & videos instantly</sub></td>
-<td align="center">☁️<br/><b>iCloud vs Device</b><br/><sub>Clear visibility of where files live</sub></td>
+<td align="center" width="33%" style="padding: 10px; border: 1px solid #30363d; border-radius: 8px;">📊<br/><b style="color: #c9d1d9;">Storage Insights</b><br/><sub style="color: #8b949e;">See what's cluttering device & iCloud</sub></td>
+<td align="center" width="33%" style="padding: 10px; border: 1px solid #30363d; border-radius: 8px;">🔍<br/><b style="color: #c9d1d9;">Sort by Size</b><br/><sub style="color: #8b949e;">Find large photos & videos instantly</sub></td>
+<td align="center" width="33%" style="padding: 10px; border: 1px solid #30363d; border-radius: 8px;">☁️<br/><b style="color: #c9d1d9;">iCloud vs Device</b><br/><sub style="color: #8b949e;">Clear visibility of where files live</sub></td>
 </tr>
 <tr>
-<td align="center">�<br/><b>Filter by Date</b><br/><sub>Target old, forgotten media</sub></td>
-<td align="center">�️<br/><b>Batch Delete</b><br/><sub>Clean up hundreds in one tap</sub></td>
-<td align="center">🔒<br/><b>Privacy First</b><br/><sub>All analysis stays on your device</sub></td>
+<td align="center" width="33%" style="padding: 10px; border: 1px solid #30363d; border-radius: 8px;">📅<br/><b style="color: #c9d1d9;">Filter by Date</b><br/><sub style="color: #8b949e;">Target old, forgotten media</sub></td>
+<td align="center" width="33%" style="padding: 10px; border: 1px solid #30363d; border-radius: 8px;">🗑️<br/><b style="color: #c9d1d9;">Batch Delete</b><br/><sub style="color: #8b949e;">Clean up hundreds in one tap</sub></td>
+<td align="center" width="33%" style="padding: 10px; border: 1px solid #30363d; border-radius: 8px;">🔒<br/><b style="color: #c9d1d9;">Privacy First</b><br/><sub style="color: #8b949e;">All analysis stays on your device</sub></td>
 </tr>
 </table>
 
-**[🌐 Visit photo-trim.com](https://www.photo-trim.com)** · **[📱 Download on App Store](https://apps.apple.com/app/photo-trim)**
+<br/>
+
+<a href="https://www.photo-trim.com" style="text-decoration: none; font-weight: bold; font-size: 16px;">🌐 Visit photo-trim.com</a>
+&nbsp;&nbsp;·&nbsp;&nbsp;
+<a href="https://apps.apple.com/app/photo-trim" style="text-decoration: none; font-weight: bold; font-size: 16px;">📱 Download on App Store</a>
+
+<br/><br/>
+
+</td>
+</tr>
+</table>
 
 </div>
 

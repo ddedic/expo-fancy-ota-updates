@@ -10,16 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.2.0] - 2025-12-08
 
 ### Added
-- **Modular Info Screen**: Completely refactored `OTAInfoScreen` to support custom render functions (`renderInfo`, `renderActions`, `renderChangelog`) and exported sub-components (`OTAUpdateInfo`, `OTAUpdateActions`, `OTAUpdateChangelog`) for full flexibility.
-- **Improved Feedback**: Added immediate visual alerts for "Check for Update" actions (Success, Up to Date, Error, Skipped).
-- **Enhanced UI**: Implemented a modern card-based layout with grouped information sections and distinct action buttons.
+- **Refactored Architecture**: Split `OTAInfoScreen` into modular, exported sub-components (`OTAUpdateInfo`, `OTAUpdateActions`, `OTAUpdateChangelog`).
+- **Render Props**: Added `renderInfo`, `renderActions`, `renderChangelog` for full UI customization.
+- **Mode Support**: Added `mode` prop ('developer' | 'user') to `OTAInfoScreen` to toggle between debug-heavy and user-friendly views.
+- **Improved Feedback**: Added native alerts for "Check for Update" results (Available, Up to Date, Error, Skipped).
+- **Simulation Mode**: Added `simulateUpdate()` debug action to test update flows without a real update.
+- **Granular Control**: Added explicit visibility props (`showRuntimeVersion`, `showUpdateId`, etc.) to toggle individual info rows.
+- **Enhanced UI**: Completely redesigned with a modern card-based layout, grouped info sections, and distinct action buttons.
 
 ### Changed
-- **Layout**: Moved "Actions" and "Debug" sections above the "What's New" changelog for better accessibility without scrolling.
-- **Visuals**: improved spacing and hierarchy; added distinct separation for the changelog section.
+- **Accessibility**: Moved critical Action Buttons and Debug tools *above* the Changelog section to eliminate scrolling.
+- **Visuals**: improved spacing, typography, and section separation.
 
 ### Fixed
-- Fixed missing `downloading` state in `UpdateStatus` type definition.
+- Fixed missing `downloading` status in TypeScript definitions.
 
 ## [1.1.5] - 2025-12-07
 

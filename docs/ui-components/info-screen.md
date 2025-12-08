@@ -20,21 +20,45 @@ function SettingsScreen() {
 
 ## Props
 
+### `mode`
+- **Type:** `'developer' | 'user'`
+- **Default:** `'developer'`
+
+Development mode shows extra debug info (runtime version, update ID, channel). User mode is cleaner and only shows what's relevant to end users.
+
+### `renderInfo`
+- **Type:** `(props: RenderInfoProps) => ReactNode`
+- **Required:** No
+
+Custom render for the info section (version, date, status).
+
+### `renderActions`
+- **Type:** `(props: RenderActionsProps) => ReactNode`
+- **Required:** No
+
+Custom render for the actions section (buttons, progress).
+
+### `renderChangelog`
+- **Type:** `(props: RenderChangelogProps) => ReactNode`
+- **Required:** No
+
+Custom render for the changelog list.
+
+### Visibility Props
+- `showRuntimeVersion` (boolean)
+- `showOtaVersion` (boolean)
+- `showReleaseDate` (boolean)
+- `showUpdateId` (boolean)
+- `showCheckButton` (boolean)
+- `showDownloadButton` (boolean)
+- `showReloadButton` (boolean)
+- `showDebugSection` (boolean)
+
 ### `onBack`
 - **Type:** `() => void`
 - **Required:** No
 
-Back navigation callback. If not provided, no back button is shown.
-
-### `hideDebug`
-- **Type:** `boolean`
-- **Default:** `false`
-
-Hide the debug section.
-
-```tsx
-<OTAInfoScreen hideDebug={!__DEV__} />
-```
+Back navigation callback.
 
 ### `style`
 - **Type:** `ViewStyle`
@@ -42,20 +66,26 @@ Hide the debug section.
 
 Custom container style.
 
-### `renderHeader`
-- **Type:** `(props: RenderHeaderProps) => ReactNode`
-- **Required:** No
+## Modular Sub-Components
 
-Custom header render function.
+You can also import sub-components directly to build your own screen:
+
+```tsx
+import { 
+  OTAUpdateInfo, 
+  OTAUpdateActions, 
+  OTAUpdateChangelog 
+} from '@ddedic/expo-fancy-ota-updates';
+```
 
 ## Features
 
-- 📊 **Version Information** — Current version, build number, release date
-- 📝 **Changelog Display** — All changelog items
-- 🔄 **Manual Controls** — Check, download, reload buttons
-- 🐛 **Debug Section** — Update ID, channel, runtime version
-- 🎨 **Themed** — Respects provider theme
-- 📱 **Safe Area Aware** — Works with notches
+- 📊 **Dual Modes** — Developer (debug info) vs User (simple view)
+- 🧩 **Modular Architecture** — Use the whole screen or just parts of it
+- 🎨 **Fully Customizable** — Render props for every section
+- 📝 **Changelog Display** — Auto-parsed conventional commits
+- 🎮 **Simulation Mode** — Test update flows with `simulateUpdate()`
+- 🔄 **Manual Controls** — Check, download, reload with instant feedback
 
 ## Custom Header
 
@@ -133,6 +163,8 @@ function SettingsScreen() {
 ```
 
 ## Screenshot
+
+![OTA Info Screen](/screenshots/screenshot-4.PNG)
 
 The info screen displays:
 
