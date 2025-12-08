@@ -38,8 +38,10 @@ export function UpdateBanner({
     isUpdateAvailable, 
     isDownloading, 
     isDownloaded, 
+    isSimulating,
     downloadUpdate, 
     reloadApp,
+    resetSimulation,
     otaVersion,
     theme,
     translations,
@@ -75,6 +77,10 @@ export function UpdateBanner({
 
   const handleDismiss = () => {
     setIsDismissed(true);
+    // If we're simulating, reset the simulation state so isUpdateAvailable goes back to false
+    if (isSimulating) {
+      resetSimulation();
+    }
     onDismiss?.();
   };
 

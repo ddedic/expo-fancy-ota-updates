@@ -115,6 +115,8 @@ export interface OTAInfoScreenTranslations {
   debugTitle: string;
   /** Simulate update button */
   simulateUpdate: string;
+  /** Hide simulation button (when simulating) */
+  hideSimulation: string;
   /** DEV mode label */
   devMode: string;
   /** N/A placeholder */
@@ -177,6 +179,8 @@ export interface OTAUpdatesContextValue {
   checkError: Error | null;
   downloadError: Error | null;
   lastCheck: Date | null;
+  /** True when showing a simulated update banner (for testing) */
+  isSimulating: boolean;
   
   // expo-updates metadata
   currentUpdateId: string | null;
@@ -194,7 +198,10 @@ export interface OTAUpdatesContextValue {
   checkForUpdate: () => Promise<void>;
   downloadUpdate: () => Promise<void>;
   reloadApp: () => Promise<void>;
+  /** Simulate update banner for testing (shows banner, resets on dismiss) */
   simulateUpdate: () => void;
+  /** Reset simulation state (called automatically when banner is dismissed during simulation) */
+  resetSimulation: () => void;
   
   // Theming & i18n
   theme: OTATheme;
@@ -243,8 +250,38 @@ export interface OTAInfoScreenProps {
   renderHeader?: (props: { theme: OTATheme; onBack?: () => void }) => React.ReactNode;
   /** Callback for back navigation */
   onBack?: () => void;
-  /** Hide debug section */
-  hideDebug?: boolean;
   /** Custom style for the container */
   style?: object;
+  
+  // Mode configuration
+  /** 
+   * Screen mode: 'developer' shows all debug features, 'user' shows clean production UI
+   * @default 'developer'
+   */
+  mode?: 'developer' | 'user';
+  
+  // Visibility configuration (all default to true, but mode affects defaults)
+  /** Show runtime version info */
+  showRuntimeVersion?: boolean;
+  /** Show OTA version and build number */
+  showOtaVersion?: boolean;
+  /** Show release date */
+  showReleaseDate?: boolean;
+  /** Show update ID (truncated) */
+  showUpdateId?: boolean;
+  /** Show channel info in header */
+  showChannel?: boolean;
+  /** Show changelog/what's new section */
+  showChangelog?: boolean;
+  /** Show "Check for Updates" button */
+  showCheckButton?: boolean;
+  /** Show "Download Update" button when update available */
+  showDownloadButton?: boolean;
+  /** Show "Reload App" button when update downloaded */
+  showReloadButton?: boolean;
+  /** Show debug section with simulate button */
+  showDebugSection?: boolean;
+  
+  /** @deprecated Use mode='user' or showDebugSection={false} instead */
+  hideDebug?: boolean;
 }

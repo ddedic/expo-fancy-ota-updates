@@ -91,6 +91,7 @@ export const defaultTranslations: OTATranslations = {
     reloadApp: 'Reload App Now',
     debugTitle: 'Debug Actions',
     simulateUpdate: 'Simulate Update Banner',
+    hideSimulation: 'Hide Update Banner',
     devMode: 'DEV MODE',
     notAvailable: 'N/A',
     none: 'None',

@@ -56,6 +56,7 @@ export function OTAUpdatesProvider({
   const [downloadError, setDownloadError] = useState<Error | null>(null);
   const [lastCheck, setLastCheck] = useState<Date | null>(null);
   const [isUpdateAvailable, setIsUpdateAvailable] = useState(false);
+  const [isSimulating, setIsSimulating] = useState(false);
 
   // Debug logger
   const log = useCallback((message: string, ...args: unknown[]) => {
@@ -155,9 +156,18 @@ export function OTAUpdatesProvider({
     await Updates.reloadAsync();
   }, [log]);
 
-  // Debug function to simulate update banner
+  // Reset simulation state (called when banner is dismissed during simulation)
+  const resetSimulation = useCallback(() => {
+    log('Resetting simulation state');
+    setIsSimulating(false);
+    setIsUpdateAvailable(false);
+    setStatus('idle');
+  }, [log]);
+
+  // Debug function to simulate update banner - real life flow
   const simulateUpdate = useCallback(() => {
     log('Simulating update for debug purposes');
+    setIsSimulating(true);
     setIsUpdateAvailable(true);
     setStatus('available');
   }, [log]);
@@ -203,6 +213,7 @@ export function OTAUpdatesProvider({
     checkError,
     downloadError,
     lastCheck,
+    isSimulating,
     
     // expo-updates metadata
     currentUpdateId: Updates.updateId ?? null,
@@ -221,6 +232,7 @@ export function OTAUpdatesProvider({
     downloadUpdate,
     reloadApp,
     simulateUpdate,
+    resetSimulation,
     
     // Theming & i18n
     theme,
@@ -231,11 +243,13 @@ export function OTAUpdatesProvider({
     checkError,
     downloadError,
     lastCheck,
+    isSimulating,
     versionData,
     checkForUpdate,
     downloadUpdate,
     reloadApp,
     simulateUpdate,
+    resetSimulation,
     theme,
     translations,
   ]);
