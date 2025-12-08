@@ -4,7 +4,7 @@
  */
 
 export { UpdateBanner } from './UpdateBanner';
-export { OTAInfoScreen } from './OTAInfoScreen';
+export * from './OTAInfoScreen';
 export { 
   DownloadIcon, 
   RefreshIcon, 

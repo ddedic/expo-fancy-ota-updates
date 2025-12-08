@@ -82,7 +82,7 @@ features:
     <p style="color: #666; font-size: 0.9rem;">Real-time download status</p>
   </div>
   <div style="text-align: center;">
-    <img src="/screenshots/screenshot-3.PNG?url" alt="OTA Info Screen" style="width: 100%; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+    <img src="/screenshots/screenshot-4.PNG?url" alt="OTA Info Screen" style="width: 100%; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
     <p style="margin-top: 0.5rem; font-weight: 600;">OTA Info Screen</p>
     <p style="color: #666; font-size: 0.9rem;">Full debug & version details</p>
   </div>

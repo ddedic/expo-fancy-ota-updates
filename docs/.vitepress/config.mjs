@@ -10,6 +10,7 @@ export default defineConfig({
       { text: 'Guide', link: '/getting-started' },
       { text: 'UI Components', link: '/ui-components/provider' },
       { text: 'CLI Tool', link: '/cli/overview' },
+      { text: 'Changelog', link: '/changelog' },
       { text: 'npm', link: 'https://www.npmjs.com/package/@ddedic/expo-fancy-ota-updates' }
     ],
 
@@ -19,6 +20,7 @@ export default defineConfig({
         items: [
           { text: 'Getting Started', link: '/getting-started' },
           { text: 'Installation', link: '/installation' },
+          { text: 'Changelog', link: '/changelog' },
         ]
       },
       {
