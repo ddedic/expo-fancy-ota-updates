@@ -164,7 +164,7 @@ function SettingsScreen() {
 
 ## Screenshot
 
-![OTA Info Screen](/screenshots/screenshot-4.PNG)
+<img src="/screenshots/screenshot-4.PNG?url" alt="OTA Info Screen" style="width: 100%; border-radius: 12px; margin-top: 20px;" />
 
 The info screen displays:
 
