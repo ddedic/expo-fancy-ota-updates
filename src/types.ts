@@ -254,6 +254,41 @@ export interface UpdateBannerRenderProps {
   translations: OTABannerTranslations;
 }
 
+export interface RenderInfoProps {
+  theme: OTATheme;
+  translations: OTATranslations;
+  status: UpdateStatus;
+  isEmbeddedUpdate: boolean;
+  runtimeVersion: string | null;
+  otaVersion: string;
+  otaBuildNumber: number;
+  otaReleaseDate: string;
+  currentUpdateId: string | null;
+  channel: string | null;
+  isUpdateAvailable: boolean;
+}
+
+export interface RenderActionsProps {
+  theme: OTATheme;
+  translations: OTATranslations;
+  status: UpdateStatus;
+  isDownloading: boolean;
+  isUpdateAvailable: boolean;
+  isDownloaded: boolean;
+  isSimulating: boolean;
+  checkForUpdate: () => Promise<CheckResult>;
+  downloadUpdate: () => Promise<void>;
+  reloadApp: () => Promise<void>;
+  simulateUpdate: () => void;
+  resetSimulation: () => void;
+}
+
+export interface RenderChangelogProps {
+  theme: OTATheme;
+  translations: OTATranslations;
+  otaChangelog: string[];
+}
+
 export interface OTAInfoScreenProps {
   /** Custom header render function */
   renderHeader?: (props: { theme: OTATheme; onBack?: () => void }) => React.ReactNode;
@@ -263,11 +298,11 @@ export interface OTAInfoScreenProps {
   style?: object;
   
   /** Custom render function for the base info section (Status + Version Info) */
-  renderInfo?: (props: { theme: OTATheme }) => React.ReactNode;
+  renderInfo?: (props: RenderInfoProps) => React.ReactNode;
   /** Custom render function for the actions section (Buttons + Debug) */
-  renderActions?: (props: { theme: OTATheme }) => React.ReactNode;
+  renderActions?: (props: RenderActionsProps) => React.ReactNode;
   /** Custom render function for the changelog section */
-  renderChangelog?: (props: { theme: OTATheme }) => React.ReactNode;
+  renderChangelog?: (props: RenderChangelogProps) => React.ReactNode;
   
   // Mode configuration
   /** 

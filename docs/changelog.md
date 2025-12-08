@@ -34,7 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Visuals**: improved spacing, typography, and section separation.
 
 ### Fixed
-- Fixed missing `downloading` status in TypeScript definitions.
+- **Fixed missing `downloading` status in TypeScript definitions.**
 
 ## [1.1.5] - 2025-12-07
 

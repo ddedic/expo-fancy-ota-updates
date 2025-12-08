@@ -1,0 +1,13 @@
+## Added
+- **Enhanced Render Props**: `renderInfo`, `renderActions`, and `renderChangelog` now receive comprehensive prop objects (`RenderInfoProps`, `RenderActionsProps`, etc.) containing all necessary state and callbacks (e.g., `checkForUpdate`, `status`, `otaVersion`).
+- **Controlled Components**: `OTAUpdateInfo`, `OTAUpdateActions`, and `OTAUpdateChangelog` now accept partial props to override context values, enabling full customization.
+- **Refactored Architecture**: Split `OTAInfoScreen` into modular, exported sub-components (`OTAUpdateInfo`, `OTAUpdateActions`, `OTAUpdateChangelog`).
+
+## Changed
+- **Documentation**: Added detailed "Customization" guide to `info-screen.md` with examples for custom components and render props.
+- **Documentation**: Added Changelog to the official documentation site.
+- **Documentation**: Optimized screenshot size in docs for better readability.
+
+## Fixed
+- **Types**: Exported `RenderInfoProps`, `RenderActionsProps`, `RenderChangelogProps` from main package.
+- **Cleanup**: Refactored monolithic `OTAInfoScreen.tsx` into smaller, maintainable files.
