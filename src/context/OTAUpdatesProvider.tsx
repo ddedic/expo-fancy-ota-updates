@@ -41,6 +41,7 @@ export function OTAUpdatesProvider({
   const {
     checkOnMount = true,
     checkOnForeground = true,
+    dismissedUpdateStorage,
     autoDownload = false,
     autoReload = false,
     versionData = defaultVersionData,
@@ -241,6 +242,9 @@ export function OTAUpdatesProvider({
     // Theming & i18n
     theme,
     translations,
+
+    // Config (exposed for advanced components)
+    dismissedUpdateStorage,
   }), [
     isUpdateAvailable,
     status,
@@ -256,6 +260,7 @@ export function OTAUpdatesProvider({
     resetSimulation,
     theme,
     translations,
+    dismissedUpdateStorage,
   ]);
 
   return (

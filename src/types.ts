@@ -160,11 +160,20 @@ export interface OTAVersionData {
 // Provider Configuration
 // ============================================================================
 
+export interface OTADismissStorage {
+  /** Return the updateId that was dismissed, or null if none. */
+  getDismissedUpdateId: () => Promise<string | null>;
+  /** Persist the dismissed updateId (or clear by passing null). */
+  setDismissedUpdateId: (updateId: string | null) => Promise<void>;
+}
+
 export interface OTAConfig {
   /** Check for updates when provider mounts (default: true) */
   checkOnMount?: boolean;
   /** Check for updates when app comes to foreground (default: true) */
   checkOnForeground?: boolean;
+  /** Optional storage to persist banner dismissal per updateId */
+  dismissedUpdateStorage?: OTADismissStorage;
   /** Automatically download updates when available (default: false) */
   autoDownload?: boolean;
   /** Automatically reload when update is downloaded (default: false) */
@@ -215,6 +224,9 @@ export interface OTAUpdatesContextValue {
   // Theming & i18n
   theme: OTATheme;
   translations: OTATranslations;
+
+  // Optional config helpers
+  dismissedUpdateStorage?: OTADismissStorage;
 }
 
 // ============================================================================

@@ -39,6 +39,8 @@ export function UpdateBanner({
     isDownloading, 
     isDownloaded, 
     isSimulating,
+    currentUpdateId,
+    dismissedUpdateStorage,
     downloadUpdate, 
     reloadApp,
     resetSimulation,
@@ -68,19 +70,57 @@ export function UpdateBanner({
     transform: [{ scale: pulseScale.value }],
   }));
 
-  // Reset dismissed state when a new update becomes available
+  // Optional: persist dismissal per updateId
   useEffect(() => {
-    if (isUpdateAvailable) {
-      setIsDismissed(false);
-    }
-  }, [isUpdateAvailable]);
+    let cancelled = false;
+
+    const run = async () => {
+      if (!dismissedUpdateStorage || !currentUpdateId) {
+        // If we don't have storage or an updateId, fall back to showing when available.
+        if (isUpdateAvailable) {
+          setIsDismissed(false);
+        }
+        return;
+      }
+
+      try {
+        const dismissedId = await dismissedUpdateStorage.getDismissedUpdateId();
+        if (cancelled) {
+          return;
+        }
+
+        // Hide if the user dismissed this specific updateId, otherwise show.
+        setIsDismissed(dismissedId === currentUpdateId ? true : false);
+      } catch {
+        // Ignore storage errors and default to showing the banner.
+        if (!cancelled && isUpdateAvailable) {
+          setIsDismissed(false);
+        }
+      }
+    };
+
+    run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentUpdateId, dismissedUpdateStorage, isUpdateAvailable]);
 
   const handleDismiss = () => {
     setIsDismissed(true);
+
+    // Persist dismissal only for real updates
+    if (!isSimulating && dismissedUpdateStorage && currentUpdateId) {
+      dismissedUpdateStorage.setDismissedUpdateId(currentUpdateId).catch(() => {
+        // ignore
+      });
+    }
+
     // If we're simulating, reset the simulation state so isUpdateAvailable goes back to false
     if (isSimulating) {
       resetSimulation();
     }
+
     onDismiss?.();
   };
 
