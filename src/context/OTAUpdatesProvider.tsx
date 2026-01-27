@@ -73,11 +73,19 @@ export function OTAUpdatesProvider({
   const checkForUpdate = useCallback(async (): Promise<CheckResult> => {
     if (__DEV__) {
       log('Skipping update check in DEV mode');
+      setLastCheck(new Date());
+      setCheckError(null);
+      setIsUpdateAvailable(false);
+      setStatus('idle');
       return { isAvailable: false, status: 'idle', isSkipped: true, reason: 'DEV mode' };
     }
 
     if (!Device.isDevice) {
       log('Skipping update check in simulator mode');
+      setLastCheck(new Date());
+      setCheckError(null);
+      setIsUpdateAvailable(false);
+      setStatus('idle');
       return { isAvailable: false, status: 'idle', isSkipped: true, reason: 'Simulator mode' };
     }
 
