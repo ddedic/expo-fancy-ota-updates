@@ -6,7 +6,15 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
+// expo-linear-gradient is an optional peer dependency.
+// Avoid a hard import so apps without it can still bundle.
+let LinearGradient: any;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  LinearGradient = require('expo-linear-gradient').LinearGradient;
+} catch {
+  LinearGradient = null;
+}
 import Animated, { 
   FadeInDown, 
   FadeOutUp, 
@@ -127,6 +135,10 @@ export function UpdateBanner({
 
   // Default banner UI
   const gradientColors = bannerGradient ?? [colors.primary, colors.primaryLight];
+  const GradientComponent: React.ElementType = LinearGradient ?? View;
+  const gradientProps = LinearGradient
+    ? { colors: gradientColors, start: { x: 0, y: 0 }, end: { x: 1, y: 1 } }
+    : {};
 
   return (
     <Animated.View 
@@ -134,11 +146,13 @@ export function UpdateBanner({
       exiting={FadeOutUp.duration((animation?.duration ?? 300) * 0.66)}
       style={[styles.container, { paddingTop: insets.top }, style]}
     >
-      <LinearGradient
-        colors={gradientColors}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.gradient}
+      <GradientComponent
+        // eslint-disable-next-line react/jsx-props-no-spreading
+        {...gradientProps}
+        style={[
+          styles.gradient,
+          !LinearGradient && { backgroundColor: gradientColors[0] },
+        ]}
       >
         <View style={[styles.content, { borderBottomColor: gradientColors[1] }]}>
           <View style={[styles.iconContainer, { backgroundColor: '#FFFFFF' }]}>
@@ -192,7 +206,7 @@ export function UpdateBanner({
             </TouchableOpacity>
           </View>
         </View>
-      </LinearGradient>
+      </GradientComponent>
     </Animated.View>
   );
 }
