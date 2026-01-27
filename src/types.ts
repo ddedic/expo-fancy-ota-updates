@@ -160,11 +160,36 @@ export interface OTAVersionData {
 // Provider Configuration
 // ============================================================================
 
+export interface OTAUpdatesAdapter {
+  // Metadata
+  updateId?: string | null;
+  channel?: string | null;
+  runtimeVersion?: string | null;
+  isEmbeddedLaunch: boolean;
+
+  // Actions
+  checkForUpdateAsync: () => Promise<{ isAvailable: boolean; manifest?: any }>;
+  fetchUpdateAsync: () => Promise<void>;
+  reloadAsync: () => Promise<void>;
+}
+
+export interface OTADeviceAdapter {
+  /** True only on a physical device */
+  isDevice: boolean;
+}
+
 export interface OTAConfig {
   /** Check for updates when provider mounts (default: true) */
   checkOnMount?: boolean;
   /** Check for updates when app comes to foreground (default: true) */
   checkOnForeground?: boolean;
+
+  /**
+   * Optional adapters (useful for testing/mocking). Defaults to expo-updates / expo-device.
+   */
+  updatesAdapter?: OTAUpdatesAdapter;
+  deviceAdapter?: OTADeviceAdapter;
+
   /** Automatically download updates when available (default: false) */
   autoDownload?: boolean;
   /** Automatically reload when update is downloaded (default: false) */

@@ -41,11 +41,17 @@ export function OTAUpdatesProvider({
   const {
     checkOnMount = true,
     checkOnForeground = true,
+    updatesAdapter,
+    deviceAdapter,
     autoDownload = false,
     autoReload = false,
     versionData = defaultVersionData,
     debug = __DEV__,
   } = config;
+
+  // Allow injecting adapters (useful for tests/mocks)
+  const updates = updatesAdapter ?? Updates;
+  const device = deviceAdapter ?? Device;
 
   // Merge theme and translations with defaults
   const theme = useMemo<OTATheme>(() => mergeTheme(customTheme), [customTheme]);
@@ -76,7 +82,7 @@ export function OTAUpdatesProvider({
       return { isAvailable: false, status: 'idle', isSkipped: true, reason: 'DEV mode' };
     }
 
-    if (!Device.isDevice) {
+    if (!device.isDevice) {
       log('Skipping update check in simulator mode');
       return { isAvailable: false, status: 'idle', isSkipped: true, reason: 'Simulator mode' };
     }
@@ -86,7 +92,7 @@ export function OTAUpdatesProvider({
       setCheckError(null);
       log('Checking for updates...');
       
-      const update = await Updates.checkForUpdateAsync();
+      const update = await updates.checkForUpdateAsync();
       setLastCheck(new Date());
 
       if (update.isAvailable) {
@@ -119,7 +125,7 @@ export function OTAUpdatesProvider({
       return;
     }
 
-    if (!Device.isDevice) {
+    if (!device.isDevice) {
       log('Skipping update download in simulator mode');
       return;
     }
@@ -129,7 +135,7 @@ export function OTAUpdatesProvider({
       setDownloadError(null);
       log('Downloading update...');
       
-      await Updates.fetchUpdateAsync();
+      await updates.fetchUpdateAsync();
       
       log('Update downloaded!');
       setStatus('downloaded');
@@ -151,13 +157,13 @@ export function OTAUpdatesProvider({
       return;
     }
 
-    if (!Device.isDevice) {
+    if (!device.isDevice) {
       log('Skipping app reload in simulator mode');
       return;
     }
 
     log('Reloading app...');
-    await Updates.reloadAsync();
+    await updates.reloadAsync();
   }, [log]);
 
   // Reset simulation state (called when banner is dismissed during simulation)
@@ -220,10 +226,10 @@ export function OTAUpdatesProvider({
     isSimulating,
     
     // expo-updates metadata
-    currentUpdateId: Updates.updateId ?? null,
-    channel: Updates.channel ?? null,
-    runtimeVersion: Updates.runtimeVersion ?? null,
-    isEmbeddedUpdate: Updates.isEmbeddedLaunch,
+    currentUpdateId: updates.updateId ?? null,
+    channel: updates.channel ?? null,
+    runtimeVersion: updates.runtimeVersion ?? null,
+    isEmbeddedUpdate: updates.isEmbeddedLaunch,
     
     // Version data
     otaVersion: versionData.version,
@@ -256,6 +262,7 @@ export function OTAUpdatesProvider({
     resetSimulation,
     theme,
     translations,
+    updates,
   ]);
 
   return (

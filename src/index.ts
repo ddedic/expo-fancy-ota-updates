@@ -16,6 +16,8 @@ export type {
   OTATranslations,
   OTAVersionData,
   OTAConfig as OTAProviderConfig,
+  OTAUpdatesAdapter,
+  OTADeviceAdapter,
   OTAUpdatesContextValue,
   UpdateBannerProps,
   OTAInfoScreenProps,
