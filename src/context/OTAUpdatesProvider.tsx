@@ -181,24 +181,30 @@ export function OTAUpdatesProvider({
   // Effects
   // ============================================================================
 
-  const shouldThrottleCheck = useCallback(() => {
+  const getThrottleInfo = useCallback(() => {
     if (!minCheckIntervalMs) {
-      return false;
+      return { throttled: false, lastCheckIso: null as string | null };
     }
     if (!lastCheck) {
-      return false;
+      return { throttled: false, lastCheckIso: null as string | null };
     }
     const elapsed = Date.now() - lastCheck.getTime();
-    return elapsed < minCheckIntervalMs;
+    return {
+      throttled: elapsed < minCheckIntervalMs,
+      lastCheckIso: lastCheck.toISOString(),
+    };
   }, [lastCheck, minCheckIntervalMs]);
 
   const autoCheckForUpdate = useCallback(async () => {
-    if (shouldThrottleCheck()) {
-      log(`Skipping auto check (throttled). Last check: ${lastCheck?.toISOString()}`);
+    const { throttled, lastCheckIso } = getThrottleInfo();
+
+    if (throttled) {
+      log(`Skipping auto check (throttled). Last check: ${lastCheckIso}`);
       return;
     }
+
     await checkForUpdate();
-  }, [checkForUpdate, lastCheck, log, shouldThrottleCheck]);
+  }, [checkForUpdate, getThrottleInfo, log]);
 
   // Check for updates on mount
   useEffect(() => {
