@@ -41,6 +41,7 @@ export function OTAUpdatesProvider({
   const {
     checkOnMount = true,
     checkOnForeground = true,
+    minCheckIntervalMs = 60_000,
     autoDownload = false,
     autoReload = false,
     versionData = defaultVersionData,
@@ -180,12 +181,31 @@ export function OTAUpdatesProvider({
   // Effects
   // ============================================================================
 
+  const shouldThrottleCheck = useCallback(() => {
+    if (!minCheckIntervalMs) {
+      return false;
+    }
+    if (!lastCheck) {
+      return false;
+    }
+    const elapsed = Date.now() - lastCheck.getTime();
+    return elapsed < minCheckIntervalMs;
+  }, [lastCheck, minCheckIntervalMs]);
+
+  const autoCheckForUpdate = useCallback(async () => {
+    if (shouldThrottleCheck()) {
+      log(`Skipping auto check (throttled). Last check: ${lastCheck?.toISOString()}`);
+      return;
+    }
+    await checkForUpdate();
+  }, [checkForUpdate, lastCheck, log, shouldThrottleCheck]);
+
   // Check for updates on mount
   useEffect(() => {
     if (checkOnMount) {
-      checkForUpdate();
+      autoCheckForUpdate();
     }
-  }, [checkOnMount, checkForUpdate]);
+  }, [checkOnMount, autoCheckForUpdate]);
 
   // Check for updates when app comes to foreground
   useEffect(() => {
@@ -193,7 +213,7 @@ export function OTAUpdatesProvider({
 
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
       if (nextAppState === 'active') {
-        checkForUpdate();
+        autoCheckForUpdate();
       }
     };
 
@@ -202,7 +222,7 @@ export function OTAUpdatesProvider({
     return () => {
       subscription.remove();
     };
-  }, [checkOnForeground, checkForUpdate]);
+  }, [checkOnForeground, autoCheckForUpdate]);
 
   // ============================================================================
   // Context Value
