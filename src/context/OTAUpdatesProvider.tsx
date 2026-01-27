@@ -3,7 +3,7 @@
  * OTA Updates Context Provider
  */
 
-import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import * as Updates from 'expo-updates';
 import * as Device from 'expo-device';
 import { AppState, AppStateStatus } from 'react-native';
@@ -57,6 +57,7 @@ export function OTAUpdatesProvider({
   const [checkError, setCheckError] = useState<Error | null>(null);
   const [downloadError, setDownloadError] = useState<Error | null>(null);
   const [lastCheck, setLastCheck] = useState<Date | null>(null);
+  const lastCheckRef = useRef<Date | null>(null);
   const [isUpdateAvailable, setIsUpdateAvailable] = useState(false);
   const [isSimulating, setIsSimulating] = useState(false);
 
@@ -70,6 +71,11 @@ export function OTAUpdatesProvider({
   // ============================================================================
   // Actions
   // ============================================================================
+
+  const setLastCheckSafe = useCallback((date: Date) => {
+    lastCheckRef.current = date;
+    setLastCheck(date);
+  }, []);
 
   const checkForUpdate = useCallback(async (): Promise<CheckResult> => {
     if (__DEV__) {
@@ -88,7 +94,7 @@ export function OTAUpdatesProvider({
       log('Checking for updates...');
       
       const update = await Updates.checkForUpdateAsync();
-      setLastCheck(new Date());
+      setLastCheckSafe(new Date());
 
       if (update.isAvailable) {
         log('Update available!');
@@ -182,18 +188,22 @@ export function OTAUpdatesProvider({
   // ============================================================================
 
   const getThrottleInfo = useCallback(() => {
-    if (!minCheckIntervalMs) {
+    // Allow disabling throttling explicitly by setting minCheckIntervalMs to 0
+    if (minCheckIntervalMs == null || minCheckIntervalMs === 0) {
       return { throttled: false, lastCheckIso: null as string | null };
     }
-    if (!lastCheck) {
+
+    const last = lastCheckRef.current;
+    if (!last) {
       return { throttled: false, lastCheckIso: null as string | null };
     }
-    const elapsed = Date.now() - lastCheck.getTime();
+
+    const elapsed = Date.now() - last.getTime();
     return {
       throttled: elapsed < minCheckIntervalMs,
-      lastCheckIso: lastCheck.toISOString(),
+      lastCheckIso: last.toISOString(),
     };
-  }, [lastCheck, minCheckIntervalMs]);
+  }, [minCheckIntervalMs]);
 
   const autoCheckForUpdate = useCallback(async () => {
     const { throttled, lastCheckIso } = getThrottleInfo();

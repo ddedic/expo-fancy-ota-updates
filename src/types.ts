@@ -165,7 +165,7 @@ export interface OTAConfig {
   checkOnMount?: boolean;
   /** Check for updates when app comes to foreground (default: true) */
   checkOnForeground?: boolean;
-  /** Minimum time between automatic checks (mount/foreground) in ms (default: 60000). Manual checkForUpdate() is not throttled. */
+  /** Minimum time between automatic checks (mount/foreground) in ms (default: 60000). Set to 0 to disable throttling. Manual checkForUpdate() is not throttled. */
   minCheckIntervalMs?: number;
   /** Automatically download updates when available (default: false) */
   autoDownload?: boolean;
