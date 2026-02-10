@@ -77,6 +77,8 @@ Provider behavior configuration.
   config={{
     checkOnMount: true,
     checkOnForeground: true,
+    minCheckIntervalMs: 30000,
+    recordSkippedChecks: true,
     autoDownload: false,
     autoReload: false,
     versionData: require('./ota-version.json'),
@@ -98,6 +100,18 @@ Check for updates when the provider mounts.
 - **Default:** `true`
 
 Check for updates when the app comes to foreground.
+
+### `minCheckIntervalMs`
+- **Type:** `number`
+- **Default:** `0`
+
+Minimum interval between `checkForUpdate` calls in milliseconds. Useful to prevent rapid re-checks when users repeatedly foreground the app.
+
+### `recordSkippedChecks`
+- **Type:** `boolean`
+- **Default:** `true`
+
+When true, skipped checks (DEV mode, simulator, throttled, updates disabled) still update `lastCheck` and expose a skip reason via `lastSkippedReason` in `useOTAUpdates()`.
 
 ### `autoDownload`
 - **Type:** `boolean`
@@ -154,6 +168,8 @@ export default function App() {
       config={{
         checkOnMount: true,
         checkOnForeground: true,
+        minCheckIntervalMs: 30000,
+        recordSkippedChecks: true,
         versionData,
       }}
     >

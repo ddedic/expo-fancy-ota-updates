@@ -129,7 +129,8 @@ function MyApp() {
 ## Features
 
 - ✨ **Animated entrance/exit** with smooth transitions
-- 🎨 **Gradient background** (if `expo-linear-gradient` installed)
+- 🎨 **Gradient background** when `expo-linear-gradient` is installed
+- 🧱 **Solid fallback** automatically when gradient dependency is not installed
 - 💫 **Pulse animation** to draw attention
 - 📱 **Safe area aware** respects device notches
 - 🎯 **Auto-dismissible** or controlled mode

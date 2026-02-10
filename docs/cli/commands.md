@@ -1,10 +1,8 @@
 # CLI Commands
 
-Complete reference for all `ota-publish` commands.
+Reference for `ota-publish`.
 
-## `ota-publish` (default)
-
-Publish an OTA update with version tracking.
+## `ota-publish` (default publish command)
 
 ### Usage
 
@@ -17,78 +15,50 @@ ota-publish [options]
 | Option | Alias | Description |
 |--------|-------|-------------|
 | `--channel <channel>` | `-c` | Target channel |
-| `--message <message>` | `-m` | Custom changelog message |
-| `--dry-run` | | Preview without publishing |
-| `--no-increment` | | Skip version increment |
-| `--interactive` | `-i` | Interactive mode |
+| `--message <message>` | `-m` | Override publish message/changelog with one custom message |
+| `--strategy <strategy>` | `-s` | Override version strategy for this run (`build`, `semver`, `date`, `custom`) |
+| `--version-format <template>` | | Override version template for this run |
+| `--platform <platform>` | `-p` | Target platform (`ios` or `android`), repeat for both |
+| `--dry-run` | | Preview actions without file writes or EAS publish |
+| `--no-increment` | | Keep current version/build, update changelog/message flow only |
+| `--interactive` | `-i` | Guided prompts |
 
 ### Examples
 
-**Basic publish:**
 ```bash
+# Basic publish
 ota-publish --channel production
-```
 
-**With custom message:**
-```bash
-ota-publish --channel production --message "Critical bug fix for iOS crash"
-```
+# Compact one-off version format
+ota-publish --channel production --version-format "{major}.{minor}.{patch}-p{build}"
 
-**Dry run:**
-```bash
+# One-off strategy override
+ota-publish --channel preview --strategy semver
+
+# Single platform publish
+ota-publish --channel production --platform ios
+
+# Multi-platform explicit publish
+ota-publish --channel production --platform ios --platform android
+
+# Dry run
 ota-publish --channel production --dry-run
 ```
 
-**Interactive mode:**
-```bash
-ota-publish --interactive
-```
+### Execution Flow
 
-**Skip version increment:**
-```bash
-ota-publish --channel development --no-increment
-```
-
-### What It Does
-
-1. ✅ Loads configuration from `ota-updates.config.js`
-2. ✅ Reads current `ota-version.json`
-3. ✅ Increments version based on strategy
-4. ✅ Generates changelog from configured source
-5. ✅ Runs `beforePublish` hook (if configured)
-6. ✅ Updates `ota-version.json`
-7. ✅ Publishes to EAS: `eas update --channel <channel>`
-8. ✅ Runs `afterPublish` hook (if configured)
-
-### Output Example
-
-```
-📦 Publishing OTA update to production
-
-✓ EAS configuration valid
-Current version: 1.0.0-production.41 (build 41)
-✓ Generated changelog (3 items)
-
-📋 Version Information:
-  Version:      1.0.0-production.42
-  Build:        42
-  Channel:      production
-  Release Date: 12/7/2025, 2:30:00 PM
-
-📝 Changelog:
-  1. Fix critical payment flow bug
-  2. Update dependencies
-  3. Improve performance
-
-✓ Updated ota-version.json
-✓ Published to EAS
-
-✨ Successfully published 1.0.0-production.42!
-```
+1. Loads `ota-updates.config.*`.
+2. Validates channels, strategy, and platform inputs.
+3. Reads current `ota-version.json`.
+4. Generates changelog from configured source.
+5. Runs `hooks.beforePublish` (can override changelog/message/version).
+6. Computes next version via strategy/template.
+7. Writes `ota-version.json` (unless dry-run).
+8. Publishes to EAS (if `eas.autoPublish`).
+9. Runs `hooks.afterPublish`.
+10. Runs `hooks.onError` on failure.
 
 ## `ota-publish init`
-
-Initialize OTA updates configuration.
 
 ### Usage
 
@@ -98,72 +68,107 @@ ota-publish init
 
 ### What It Does
 
-Creates `ota-updates.config.js` in your project root with default configuration.
+Creates `ota-updates.config.js` in the current project with:
 
-### Output
+- new dynamic version options (`versionFormatByChannel`, `channelAliases`)
+- per-channel EAS message templates
+- custom hook examples for version/changelog generation
 
+## `ota-publish revert`
+
+Republish a previous update group to a channel (rollback).
+
+### Usage
+
+```bash
+ota-publish revert --channel <channel> [options]
 ```
-📝 Initializing OTA Updates configuration...
 
-✓ Created ota-updates.config.js
+### Options
 
-Next steps:
-  1. Review and customize ota-updates.config.js
-  2. Run: npx ota-publish --channel development
-  3. Check ota-version.json for version tracking
+| Option | Alias | Description |
+|--------|-------|-------------|
+| `--channel <channel>` | `-c` | Channel to roll back |
+| `--group <groupId>` | `-g` | Update group ID (optional, otherwise interactive picker) |
+| `--message <message>` | `-m` | Republish message |
+| `--platform <platform>` | `-p` | `ios`, `android`, or `all` |
+| `--dry-run` | | Preview only |
+| `--yes` | `-y` | Skip confirmation prompt |
+
+### Semantics
+
+- Source updates are selected from the branch currently linked to the channel.
+- Group picker shows runtime version and timestamp to reduce accidental rollbacks.
+- Without `--group`, command is interactive by default.
+
+### Examples
+
+```bash
+# Interactive rollback (choose group from recent updates)
+ota-publish revert --channel production
+
+# Explicit group rollback
+ota-publish revert --channel production --group 00000000-0000-0000-0000-000000000000
+
+# Safe preview first
+ota-publish revert --channel production --dry-run
 ```
 
-### Generated Config
+## `ota-publish promote`
 
-```javascript
-export default {
-  versionFile: './ota-version.json',
-  baseVersion: '1.0.0',
-  versionFormat: '{major}.{minor}.{patch}-{channel}.{build}',
-  versionStrategy: 'build',
-  
-  changelog: {
-    source: 'git',
-    commitCount: 10,
-    format: 'short',
-    includeAuthor: false,
-  },
-  
-  eas: {
-    autoPublish: true,
-    messageFormat: 'v{version}: {firstChange}',
-  },
-  
-  channels: ['development', 'preview', 'production'],
-  defaultChannel: 'development',
-};
+Copy an update group from one channel to another (for example `preview -> production`).
+
+### Usage
+
+```bash
+ota-publish promote --from <channel> --to <channel> [options]
+```
+
+### Options
+
+| Option | Alias | Description |
+|--------|-------|-------------|
+| `--from <channel>` | | Source channel |
+| `--to <channel>` | | Destination channel |
+| `--group <groupId>` | `-g` | Update group ID (optional, otherwise interactive picker) |
+| `--message <message>` | `-m` | Republish message |
+| `--platform <platform>` | `-p` | `ios`, `android`, or `all` |
+| `--dry-run` | | Preview only |
+| `--yes` | `-y` | Skip confirmation prompt |
+
+### Semantics
+
+- Source group is selected from the branch linked to `--from` channel.
+- Republish target is `--to` channel.
+- Command blocks `--from` equal to `--to`.
+
+### Examples
+
+```bash
+# Interactive promote (choose source update group)
+ota-publish promote --from preview --to production
+
+# Explicit group promote
+ota-publish promote --from preview --to production --group 00000000-0000-0000-0000-000000000000
+
+# Safe preview first
+ota-publish promote --from preview --to production --dry-run
 ```
 
 ## Interactive Mode
 
-When using `--interactive`, you'll be prompted for:
-
-1. **Channel selection** — Choose from configured channels
-2. **Changelog source** — Use git commits or enter custom message
-3. **Confirmation** — Review and confirm before publishing
-
-### Example Session
-
 ```bash
-$ ota-publish --interactive
-
-? Select channel: › production
-? Use git commits for changelog? › Yes
-? Proceed with publish? › Yes
-
-📦 Publishing OTA update to production
-...
-✨ Successfully published!
+ota-publish --interactive
 ```
 
-## npm Scripts
+Prompts for:
 
-Add to your `package.json`:
+1. channel
+2. changelog source preference (git vs message)
+3. custom message (optional)
+4. final confirmation
+
+## npm Scripts
 
 ```json
 {
@@ -171,22 +176,16 @@ Add to your `package.json`:
     "ota:dev": "ota-publish --channel development",
     "ota:preview": "ota-publish --channel preview",
     "ota:prod": "ota-publish --channel production",
+    "ota:revert:prod": "ota-publish revert --channel production",
+    "ota:promote:preview-to-prod": "ota-publish promote --from preview --to production",
+    "ota:prod:ios": "ota-publish --channel production --platform ios",
     "ota:prod:dry": "ota-publish --channel production --dry-run"
   }
 }
 ```
 
-Then run:
-
-```bash
-npm run ota:dev
-npm run ota:preview
-npm run ota:prod
-npm run ota:prod:dry
-```
-
 ## Next Steps
 
-- [Configuration Options →](/cli/configuration)
-- [Hooks System →](/guides/hooks)
-- [Complete Workflow →](/examples/workflow)
+- [Configuration Options](/cli/configuration)
+- [Hooks System](/guides/hooks)
+- [Complete Workflow](/examples/workflow)

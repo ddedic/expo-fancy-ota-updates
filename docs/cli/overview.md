@@ -1,131 +1,68 @@
 # CLI Overview
 
-The `ota-publish` CLI tool automates OTA update publishing with intelligent version tracking and changelog generation.
+`ota-publish` automates OTA versioning, changelog generation, and EAS publishing.
 
-## What It Does
+## Core Flow
 
 ```bash
 npx ota-publish --channel production
 ```
 
-**Automatically:**
-1. 📖 Reads current `ota-version.json`
-2. 🔢 Increments version number
-3. 📝 Generates changelog from git commits
-4. 💾 Updates `ota-version.json`
-5. 🚀 Publishes to EAS
+The command:
 
-## Key Features
+1. reads `ota-version.json`
+2. computes next version
+3. builds changelog
+4. writes updated version metadata
+5. publishes with `eas update`
 
-### Version Strategies
+## What Is New
 
-Choose how versions increment:
+- Real `custom` version strategy via `hooks.generateVersion`
+- Real `custom` changelog source via `hooks.generateChangelog`
+- Per-channel version and message templates
+- Channel aliases for compact version strings (`{channelAlias}`)
+- Hook result overrides from `beforePublish` (changelog, message, version)
+- CLI one-off overrides (`--strategy`, `--version-format`, `--platform`)
+- New release management commands: `revert` and `promote`
+- Better config validation for invalid channel mappings
+- Safe-by-default release flow with confirm prompts and `--dry-run`
 
-- **`build`** (default) — `1.0.0-prod.42` → `1.0.0-prod.43`
-- **`semver`** — `1.0.0-prod.42` → `1.0.1-prod.43`
-- **`date`** — `1.0.0-prod.20250107`
+## Versioning Options
 
-### Changelog Sources
+- `build` (default)
+- `semver`
+- `date`
+- `custom`
 
-Auto-generate from multiple sources:
-
-- **Git commits** (default) — Last N commits
-- **Manual input** — Interactive prompts
-- **File** — Read from CHANGELOG.md
-- **Custom** — Via hooks
-
-### Interactive Mode
-
-```bash
-npx ota-publish --interactive
-```
-
-Guided prompts for:
-- Channel selection
-- Changelog input
-- Publish confirmation
-
-### Dry Run
-
-```bash
-npx ota-publish --channel production --dry-run
-```
-
-Preview changes without publishing.
-
-### Hooks System
-
-Run custom logic at different stages:
+Example compact production version:
 
 ```javascript
-hooks: {
-  beforePublish: async (version) => {
-    // Run tests, linting
+export default {
+  channelAliases: { production: 'p' },
+  versionFormatByChannel: {
+    production: '{major}.{minor}.{patch}-p{build}',
   },
-  afterPublish: async (version) => {
-    // Send notifications
-  }
-}
+};
 ```
+
+## Changelog Sources
+
+- `git`
+- `manual`
+- `file`
+- `custom`
 
 ## Quick Start
 
-### 1. Initialize
-
 ```bash
 npx ota-publish init
-```
-
-Creates `ota-updates.config.js` in your project root.
-
-### 2. Configure
-
-```javascript
-// ota-updates.config.js
-export default {
-  versionStrategy: 'build',
-  changelog: {
-    source: 'git',
-    commitCount: 10,
-  },
-  channels: ['development', 'preview', 'production'],
-}
-```
-
-### 3. Publish
-
-```bash
-# Development
 npx ota-publish --channel development
-
-# Production
-npx ota-publish --channel production
+npx ota-publish promote --from preview --to production --dry-run
 ```
 
-## npm Scripts
+## Next
 
-Add to your `package.json`:
-
-```json
-{
-  "scripts": {
-    "ota:dev": "npx ota-publish --channel development",
-    "ota:preview": "npx ota-publish --channel preview",
-    "ota:prod": "npx ota-publish --channel production"
-  }
-}
-```
-
-Then run:
-
-```bash
-npm run ota:dev
-npm run ota:preview
-npm run ota:prod
-```
-
-## Next Steps
-
-- [Learn all commands](/cli/commands)
-- [Configure the CLI](/cli/configuration)
-- [Use hooks](/guides/hooks)
+- [Commands](/cli/commands)
+- [Configuration](/cli/configuration)
+- [Hooks](/guides/hooks)

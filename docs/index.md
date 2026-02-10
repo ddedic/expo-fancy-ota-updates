@@ -36,15 +36,19 @@ features:
   
   - icon: 📊
     title: Version Strategies
-    details: Choose from semver, build number, or date-based versioning strategies.
+    details: Choose from build, semver, date, or fully custom version generation hooks.
   
   - icon: 📝
     title: Smart Changelog
-    details: Auto-generate changelogs from git commits, manual input, or files.
+    details: Auto-generate changelogs from git commits, manual input, files, or custom hooks.
   
   - icon: 🪝
     title: Hooks System
     details: Run custom logic before/after publishing with a flexible hooks system.
+
+  - icon: ↩️
+    title: Revert & Promote
+    details: Safely roll back channels or promote tested updates between channels with dry-run and confirmations.
   
   - icon: 🎯
     title: Render Props
@@ -64,7 +68,7 @@ features:
   </p>
   <div style="margin-top: 1.5rem;">
     <a href="https://www.photo-trim.com" target="_blank" style="display: inline-block; background: white; color: #667eea; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; margin: 0 0.5rem;">🌐 Visit Website</a>
-    <a href="https://apps.apple.com/app/photo-trim" target="_blank" style="display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; margin: 0 0.5rem;">📱 Download on App Store</a>
+    <a href="https://apps.apple.com/app/id6755884114" target="_blank" style="display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; margin: 0 0.5rem;">📱 Download on App Store</a>
   </div>
 </div>
 

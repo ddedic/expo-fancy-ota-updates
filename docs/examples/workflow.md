@@ -39,6 +39,7 @@ export default function RootLayout() {
         versionData,
         checkOnMount: true,
         checkOnForeground: true,
+        minCheckIntervalMs: 30000,
       }}
       theme={{
         colors: {
@@ -86,10 +87,26 @@ export default {
   versionFile: './ota-version.json',
   baseVersion: 'package.json',
   versionStrategy: 'build',
+  versionFormat: '{major}.{minor}.{patch}-{channelAlias}.{build}',
+  versionFormatByChannel: {
+    production: '{major}.{minor}.{patch}-p{build}',
+  },
+  channelAliases: {
+    development: 'd',
+    preview: 'pr',
+    production: 'p',
+  },
   
   changelog: {
     source: 'git',
     commitCount: 10,
+  },
+
+  eas: {
+    messageFormat: 'v{version}: {firstChange}',
+    messageFormatByChannel: {
+      production: 'release {version} ({channelAlias})',
+    },
   },
   
   channels: ['development', 'preview', 'production'],
@@ -102,8 +119,11 @@ export default {
         await execa('npm', ['test']);
       }
     },
-    afterPublish: async (version) => {
-      console.log(`✓ Published ${version.version}`);
+    generateVersion: async ({ defaultVersion }) => {
+      return defaultVersion;
+    },
+    afterPublish: async (version, context) => {
+      console.log(`✓ Published ${version.version} with message: ${context.message}`);
     },
   },
 };
@@ -165,7 +185,20 @@ npm run ota:preview
 # 3. Publish to production
 npm run ota:prod
 
+# One-off override examples:
+ota-publish --channel production --strategy semver
+ota-publish --channel production --version-format "{major}.{minor}.{patch}-p{build}"
+ota-publish --channel production --platform ios
+
+# Promote tested preview update to production:
+ota-publish promote --from preview --to production --dry-run
+ota-publish promote --from preview --to production
+
 # 4. Monitor for issues
+
+# 5. If needed, rollback safely:
+ota-publish revert --channel production --dry-run
+ota-publish revert --channel production
 ```
 
 ## Advanced Usage

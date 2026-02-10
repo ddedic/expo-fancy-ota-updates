@@ -33,6 +33,7 @@ function MyComponent() {
 | `checkError` | `Error \| null` | Check error if any |
 | `downloadError` | `Error \| null` | Download error if any |
 | `lastCheck` | `Date \| null` | Last check timestamp |
+| `lastSkippedReason` | `string \| null` | Most recent skip reason (DEV/simulator/throttle/disabled) |
 
 ### expo-updates Metadata
 
@@ -56,7 +57,7 @@ function MyComponent() {
 
 | Method | Type | Description |
 |--------|------|-------------|
-| `checkForUpdate` | `() => Promise<void>` | Check for updates |
+| `checkForUpdate` | `() => Promise<CheckResult>` | Check for updates |
 | `downloadUpdate` | `() => Promise<void>` | Download update |
 | `reloadApp` | `() => Promise<void>` | Reload app |
 | `simulateUpdate` | `() => void` | Simulate update (dev) |
@@ -94,6 +95,28 @@ function CheckButton() {
       onPress={checkForUpdate}
       disabled={status === 'checking'}
     />
+  );
+}
+```
+
+### Handle Skipped Checks
+
+```tsx
+function CheckButtonWithSkipInfo() {
+  const { checkForUpdate, lastSkippedReason } = useOTAUpdates();
+
+  const onCheck = async () => {
+    const result = await checkForUpdate();
+    if (result.isSkipped) {
+      console.log('Skipped:', result.reason);
+    }
+  };
+
+  return (
+    <View>
+      <Button title="Check for Updates" onPress={onCheck} />
+      {lastSkippedReason && <Text>Last skipped: {lastSkippedReason}</Text>}
+    </View>
   );
 }
 ```

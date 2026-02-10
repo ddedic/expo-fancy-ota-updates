@@ -1,10 +1,8 @@
 # CLI Configuration
 
-Complete reference for `ota-updates.config.js` configuration options.
+Complete reference for `ota-updates.config.js` / `ota-updates.config.mjs`.
 
 ## Configuration File
-
-Create `ota-updates.config.js` (or `.mjs`) in your project root:
 
 ```javascript
 /**
@@ -21,33 +19,62 @@ export default {
 export default {
   versionFile: './ota-version.json',
   baseVersion: 'package.json',
-  versionFormat: '{major}.{minor}.{patch}-{channel}.{build}',
-  versionStrategy: 'build',
-  
-  changelog: {
-    source: 'git',
-    commitCount: 10,
-    format: 'short',
-    includeAuthor: false,
+
+  // Default template
+  versionFormat: '{major}.{minor}.{patch}-{channelAlias}.{build}',
+
+  // Optional per-channel template overrides
+  versionFormatByChannel: {
+    production: '{major}.{minor}.{patch}-p{build}',
   },
-  
+
+  // build | semver | date | custom
+  versionStrategy: 'build',
+
+  // Optional short labels for templates/messages
+  channelAliases: {
+    development: 'd',
+    preview: 'pr',
+    production: 'p',
+  },
+
+  changelog: {
+    source: 'git', // git | manual | file | custom
+    commitCount: 10,
+    format: 'short', // short | detailed
+    includeAuthor: false,
+    // filePath: './release-notes.md',
+  },
+
   eas: {
     autoPublish: true,
     messageFormat: 'v{version}: {firstChange}',
+    messageFormatByChannel: {
+      production: 'release {version} ({channelAlias})',
+    },
+    platforms: ['ios', 'android'],
   },
-  
+
   channels: ['development', 'preview', 'production'],
   defaultChannel: 'development',
-  
+
   hooks: {
-    beforePublish: async (version) => {
-      console.log(`Publishing ${version.version}...`);
+    beforePublish: async ({ changelog }) => {
+      return {
+        changelog: changelog.slice(0, 5),
+      };
     },
-    afterPublish: async (version) => {
-      console.log(`Published ${version.version}`);
+    generateVersion: async ({ defaultVersion, templateVars }) => {
+      return `${defaultVersion}-b${templateVars.build}`;
     },
-    onError: async (error) => {
-      console.error('Publish failed:', error);
+    generateChangelog: async () => {
+      return ['Custom release note'];
+    },
+    afterPublish: async (version, context) => {
+      console.log(`Published ${version.version} with message: ${context.message}`);
+    },
+    onError: async (error, context) => {
+      console.error(`Publish failed for channel ${context.channel}:`, error.message);
     },
   },
 };
@@ -59,190 +86,169 @@ export default {
 - **Type:** `string`
 - **Default:** `'./ota-version.json'`
 
-Path to the version tracking file.
+Path to version tracking file.
 
 ### `baseVersion`
 - **Type:** `string | 'package.json'`
 - **Default:** `'1.0.0'`
 
-Base version for versioning. Use `'package.json'` to read from package.json.
-
-```javascript
-baseVersion: 'package.json' // Reads from package.json
-baseVersion: '2.0.0'        // Fixed base version
-```
+Base semantic version used by version strategies.
 
 ### `versionFormat`
 - **Type:** `string`
 - **Default:** `'{major}.{minor}.{patch}-{channel}.{build}'`
 
-Version format template. Available placeholders:
-- `{major}` — Major version
-- `{minor}` — Minor version
-- `{patch}` — Patch version
-- `{channel}` — Channel name
-- `{build}` — Build number
-- `{timestamp}` — Date timestamp (only with `date` strategy)
+Default version template.
 
-**Examples:**
-```javascript
-'{major}.{minor}.{patch}-{channel}.{build}'
-// → 1.0.0-production.42
+### `versionFormatByChannel`
+- **Type:** `Record<string, string>`
+- **Default:** `{}`
 
-'{major}.{minor}.{patch}.{build}'
-// → 1.0.0.42
-
-'v{major}.{minor}-{channel}'
-// → v1.0-production
-```
+Per-channel version templates. Channel keys must exist in `channels`.
 
 ### `versionStrategy`
 - **Type:** `'semver' | 'build' | 'date' | 'custom'`
 - **Default:** `'build'`
 
-Version increment strategy:
+Version strategy:
 
-**`build`** — Increment build number only
-```
-1.0.0-production.42 → 1.0.0-production.43
-```
+- `build`: increments build number.
+- `semver`: increments patch and build number.
+- `date`: keeps semver base and uses `{timestamp}` if present in template.
+- `custom`: uses `hooks.generateVersion` (required).
 
-**`semver`** — Auto-increment patch version
-```
-1.0.0-production.42 → 1.0.1-production.43
-```
+### `channelAliases`
+- **Type:** `Record<string, string>`
+- **Default:** `{}`
 
-**`date`** — Include date in version
-```
-1.0.0-production.20250107
-```
+Short aliases for channel names (e.g. `production -> p`). Available in templates as `{channelAlias}`.
 
-### `changelog`
-
-Changelog generation configuration.
-
-#### `changelog.source`
+### `changelog.source`
 - **Type:** `'git' | 'manual' | 'file' | 'custom'`
 - **Default:** `'git'`
 
-Changelog source:
-- `git` — Auto-generate from git commits
-- `manual` — Interactive prompts
-- `file` — Read from file
-- `custom` — Use hooks
+- `git`: from recent commits.
+- `manual`: interactive input.
+- `file`: from `changelog.filePath` (resolved relative to config/project cwd).
+- `custom`: from `hooks.generateChangelog` (required).
 
-#### `changelog.commitCount`
+### `changelog.commitCount`
 - **Type:** `number`
 - **Default:** `10`
 
-Number of git commits to include (when `source: 'git'`).
+Number of commits when `source: 'git'`.
 
-#### `changelog.format`
+### `changelog.format`
 - **Type:** `'short' | 'detailed'`
 - **Default:** `'short'`
 
-Changelog format:
-- `short` — Commit messages only
-- `detailed` — Include commit body
-
-#### `changelog.includeAuthor`
+### `changelog.includeAuthor`
 - **Type:** `boolean`
 - **Default:** `false`
 
-Include commit author in changelog.
-
-#### `changelog.filePath`
+### `changelog.filePath`
 - **Type:** `string`
 - **Required:** When `source: 'file'`
 
-Path to changelog file.
-
-```javascript
-changelog: {
-  source: 'file',
-  filePath: './CHANGELOG.md',
-}
-```
-
-### `eas`
-
-EAS publishing configuration.
-
-#### `eas.autoPublish`
+### `eas.autoPublish`
 - **Type:** `boolean`
 - **Default:** `true`
 
-Automatically publish to EAS after version update.
-
-#### `eas.messageFormat`
+### `eas.messageFormat`
 - **Type:** `string`
 - **Default:** `'v{version}: {firstChange}'`
 
-EAS update message format. Available placeholders:
-- `{version}` — Full version string
-- `{channel}` — Channel name
-- `{build}` — Build number
-- `{firstChange}` — First changelog item
-- `{date}` — Release date
+Default EAS message template.
+
+### `eas.messageFormatByChannel`
+- **Type:** `Record<string, string>`
+- **Default:** `{}`
+
+Per-channel EAS message templates.
+
+### `eas.platforms`
+- **Type:** `('ios' | 'android')[]`
+- **Default:** `undefined` (EAS default behavior)
 
 ### `channels`
 - **Type:** `string[]`
 - **Default:** `['development', 'preview', 'production']`
 
-Available channels for publishing.
+Must contain unique values.
 
 ### `defaultChannel`
 - **Type:** `string`
 - **Default:** `'development'`
 
-Default channel when not specified.
+Must be included in `channels`.
 
 ### `hooks`
+- **Type:** `OTAHooks`
 
-Custom hooks for lifecycle events. See [Hooks Guide](/guides/hooks).
+See [Hooks Guide](/guides/hooks) for full signatures.
 
-## Examples
+## Template Variables
 
-### Read Version from package.json
+Version templates support:
+
+- `{major}`
+- `{minor}`
+- `{patch}`
+- `{channel}`
+- `{channelAlias}`
+- `{build}`
+- `{timestamp}` (YYYYMMDD)
+
+EAS message templates support:
+
+- `{version}`
+- `{channel}`
+- `{channelAlias}`
+- `{build}`
+- `{firstChange}`
+- `{date}`
+
+## Popular Patterns
+
+### Short Production Version
 
 ```javascript
 export default {
-  baseVersion: 'package.json',
-  versionFormat: '{major}.{minor}.{patch}-{channel}.{build}',
-};
-```
-
-### Semver Strategy
-
-```javascript
-export default {
-  versionStrategy: 'semver',
-  versionFormat: '{major}.{minor}.{patch}',
-};
-```
-
-### File-based Changelog
-
-```javascript
-export default {
-  changelog: {
-    source: 'file',
-    filePath: './CHANGELOG.md',
+  channelAliases: { production: 'p' },
+  versionFormatByChannel: {
+    production: '{major}.{minor}.{patch}-p{build}',
   },
 };
 ```
 
-### Custom Channels
+### Keep Version Compact Everywhere
 
 ```javascript
 export default {
-  channels: ['dev', 'staging', 'prod', 'beta'],
-  defaultChannel: 'dev',
+  channelAliases: {
+    development: 'd',
+    preview: 'pr',
+    production: 'p',
+  },
+  versionFormat: '{major}.{minor}.{patch}-{channelAlias}.{build}',
+};
+```
+
+### Fully Custom Strategy
+
+```javascript
+export default {
+  versionStrategy: 'custom',
+  hooks: {
+    generateVersion: async ({ templateVars }) => {
+      return `r${templateVars.major}.${templateVars.minor}.${templateVars.build}`;
+    },
+  },
 };
 ```
 
 ## Next Steps
 
-- [CLI Commands →](/cli/commands)
-- [Hooks System →](/guides/hooks)
-- [Complete Workflow →](/examples/workflow)
+- [CLI Commands](/cli/commands)
+- [Hooks System](/guides/hooks)
+- [Complete Workflow](/examples/workflow)

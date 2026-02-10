@@ -1,252 +1,222 @@
 # CLI Publishing Tool
 
-The package includes a powerful CLI tool for publishing OTA updates with version tracking and changelog generation.
+The package includes `ota-publish`, a configurable Expo OTA publishing CLI.
 
 ## Quick Start
 
-### 1. Initialize Configuration
-
 ```bash
 npx ota-publish init
-```
-
-This creates `ota-updates.config.js` (or `.mjs`) in your project root.
-
-### 2. Publish an Update
-
-```bash
-# Publish to development channel
 npx ota-publish --channel development
-
-# Or use interactive mode
-npx ota-publish --interactive
 ```
 
-## Usage in Your App
-
-### Option A: Direct Command (after npm publish)
-
-Once published to npm, use directly:
+## Publish Command
 
 ```bash
-npx ota-publish --channel production
+ota-publish [options]
 ```
 
-### Option B: Local Package (before npm publish)
+### Options
 
-If using the package locally, create npm scripts:
+- `-c, --channel <channel>` target channel
+- `-m, --message <message>` override publish message/changelog
+- `-s, --strategy <strategy>` one-off strategy override (`build`, `semver`, `date`, `custom`)
+- `--version-format <template>` one-off version format override
+- `-p, --platform <platform>` target `ios` or `android` (repeatable)
+- `--dry-run` preview mode
+- `--no-increment` keep existing version/build
+- `-i, --interactive` guided prompts
 
-```json
-{
-  "scripts": {
-    "ota:dev": "node node_modules/@ddedic/expo-fancy-ota-updates/bin/ota-publish.js --channel development",
-    "ota:preview": "node node_modules/@ddedic/expo-fancy-ota-updates/bin/ota-publish.js --channel preview",
-    "ota:prod": "node node_modules/@ddedic/expo-fancy-ota-updates/bin/ota-publish.js --channel production"
-  }
-}
-```
+## Revert Command
 
-Then run:
+Rollback a channel by republishing a previous update group.
 
 ```bash
-npm run ota:dev
-npm run ota:preview
-npm run ota:prod
+ota-publish revert --channel production
 ```
 
-## CLI Commands
+Options:
 
-### `ota-publish` (default)
+- `-c, --channel <channel>` channel to revert
+- `-g, --group <groupId>` explicit update group ID (optional)
+- `-m, --message <message>` republish message
+- `-p, --platform <platform>` `ios`, `android`, or `all`
+- `--dry-run` preview only
+- `-y, --yes` skip confirmation prompt
 
-Publish an OTA update.
-
-**Options:**
-- `-c, --channel <channel>` — Target channel (development, preview, production)
-- `-m, --message <message>` — Custom changelog message
-- `--dry-run` — Preview without publishing
-- `--no-increment` — Skip version increment
-- `-i, --interactive` — Interactive mode with prompts
-
-**Examples:**
+Examples:
 
 ```bash
-# Basic publish
+# Interactive picker from recent groups
+ota-publish revert --channel production
+
+# Explicit group
+ota-publish revert --channel production --group 00000000-0000-0000-0000-000000000000
+
+# Preview first
+ota-publish revert --channel production --dry-run
+```
+
+Semantics:
+- CLI resolves the channel's source branch and lists recent update groups.
+- Group picker includes runtime/version context before confirmation.
+
+## Promote Command
+
+Copy an update group between channels (for example `preview -> production`).
+
+```bash
+ota-publish promote --from preview --to production
+```
+
+Options:
+
+- `--from <channel>` source channel
+- `--to <channel>` destination channel
+- `-g, --group <groupId>` explicit update group ID (optional)
+- `-m, --message <message>` republish message
+- `-p, --platform <platform>` `ios`, `android`, or `all`
+- `--dry-run` preview only
+- `-y, --yes` skip confirmation prompt
+
+Examples:
+
+```bash
+# Interactive picker from source channel groups
+ota-publish promote --from preview --to production
+
+# Explicit group
+ota-publish promote --from preview --to production --group 00000000-0000-0000-0000-000000000000
+
+# Preview first
+ota-publish promote --from preview --to production --dry-run
+```
+
+Semantics:
+- Source group comes from the branch linked to `--from`.
+- Republish target is the branch linked to `--to`.
+
+## Examples
+
+```bash
+# Basic
 ota-publish --channel production
 
-# With custom message
-ota-publish --channel production --message "Critical bug fix"
+# Compact production format
+ota-publish --channel production --version-format "{major}.{minor}.{patch}-p{build}"
 
-# Dry run (preview only)
+# One-off strategy
+ota-publish --channel preview --strategy semver
+
+# Platform scoped
+ota-publish --channel production --platform ios
+ota-publish --channel production --platform ios --platform android
+
+# Dry run
 ota-publish --channel production --dry-run
-
-# Interactive mode
-ota-publish --interactive
 ```
 
-### `ota-publish init`
+## Config File
 
-Initialize configuration file.
-
-```bash
-ota-publish init
-```
-
-## Configuration
-
-The `ota-updates.config.js` file controls CLI behavior:
+`ota-publish init` creates `ota-updates.config.js`:
 
 ```javascript
 /**
  * @type {import('@ddedic/expo-fancy-ota-updates').OTAConfig}
  */
 export default {
-  // Version file location
   versionFile: './ota-version.json',
-  
-  // Base version (or 'package.json' to read from package.json)
-  baseVersion: '1.0.0',
-  
-  // Version format template
-  versionFormat: '{major}.{minor}.{patch}-{channel}.{build}',
-  
-  // Version strategy: 'semver' | 'build' | 'date'
+  baseVersion: 'package.json',
+
+  versionFormat: '{major}.{minor}.{patch}-{channelAlias}.{build}',
+  versionFormatByChannel: {
+    production: '{major}.{minor}.{patch}-p{build}',
+  },
   versionStrategy: 'build',
-  
-  // Changelog configuration
+
+  channelAliases: {
+    development: 'd',
+    preview: 'pr',
+    production: 'p',
+  },
+
   changelog: {
-    source: 'git', // 'git' | 'manual' | 'file'
+    source: 'git', // git | manual | file | custom
     commitCount: 10,
-    format: 'short', // 'short' | 'detailed'
+    format: 'short',
     includeAuthor: false,
   },
-  
-  // EAS configuration
+
   eas: {
     autoPublish: true,
     messageFormat: 'v{version}: {firstChange}',
+    messageFormatByChannel: {
+      production: 'release {version} ({channelAlias})',
+    },
+    platforms: ['ios', 'android'],
   },
-  
-  // Available channels
+
   channels: ['development', 'preview', 'production'],
   defaultChannel: 'development',
-  
-  // Hooks (optional)
+
   hooks: {
-    beforePublish: async (version) => {
-      console.log(`Publishing ${version.version}...`);
-      // Run tests, linting, etc.
+    beforePublish: async ({ changelog }) => {
+      return { changelog };
     },
-    afterPublish: async (version) => {
-      console.log(`Published ${version.version}`);
-      // Send notifications, update docs, etc.
+    generateVersion: async ({ defaultVersion }) => defaultVersion,
+    generateChangelog: async () => ['Custom release note'],
+    afterPublish: async (version, context) => {
+      console.log(`Published ${version.version} with "${context.message}"`);
     },
-    onError: async (error) => {
-      console.error('Publish failed:', error);
+    onError: async (error, context) => {
+      console.error(`Publish failed in ${context.cwd}:`, error.message);
     },
   },
 };
 ```
 
-### Version Strategies
+## Template Variables
 
-**`build` (default)** — Increment build number only
-```
-1.0.0-production.42 → 1.0.0-production.43
-```
+Version templates:
 
-**`semver`** — Auto-increment patch version
-```
-1.0.0-production.42 → 1.0.1-production.43
-```
+- `{major}`
+- `{minor}`
+- `{patch}`
+- `{channel}`
+- `{channelAlias}`
+- `{build}`
+- `{timestamp}`
 
-**`date`** — Include date in version
-```
-1.0.0-production.20250107
-```
+Message templates:
 
-### Changelog Sources
+- `{version}`
+- `{channel}`
+- `{channelAlias}`
+- `{build}`
+- `{firstChange}`
+- `{date}`
 
-**`git`** — Auto-generate from git commits (default)
-```javascript
-changelog: {
-  source: 'git',
-  commitCount: 10,
-  format: 'short', // or 'detailed'
-  includeAuthor: false,
+## Hooks
+
+Available hooks:
+
+- `beforePublish(context)` with override return support (`changelog`, `message`, `version`)
+- `afterPublish(version, context)`
+- `onError(error, context)`
+- `generateVersion(context)` for `versionStrategy: 'custom'`
+- `generateChangelog(context)` for `changelog.source: 'custom'`
+
+## Recommended Scripts
+
+```json
+{
+  "scripts": {
+    "ota:dev": "ota-publish --channel development",
+    "ota:preview": "ota-publish --channel preview",
+    "ota:prod": "ota-publish --channel production",
+    "ota:revert:prod": "ota-publish revert --channel production",
+    "ota:promote:preview-to-prod": "ota-publish promote --from preview --to production",
+    "ota:prod:dry": "ota-publish --channel production --dry-run",
+    "ota:prod:ios": "ota-publish --channel production --platform ios"
+  }
 }
 ```
-
-**`manual`** — Interactive prompts
-```javascript
-changelog: {
-  source: 'manual',
-}
-```
-
-**`file`** — Read from file
-```javascript
-changelog: {
-  source: 'file',
-  filePath: './CHANGELOG.md',
-}
-```
-
-### Hooks
-
-Run custom logic at different stages:
-
-```javascript
-hooks: {
-  // Before publishing (e.g., run tests)
-  beforePublish: async ({ currentVersion, channel, changelog }) => {
-    console.log(`Publishing to ${channel}...`);
-    // Run: await execa('npm', ['test']);
-  },
-  
-  // After successful publish (e.g., send notifications)
-  afterPublish: async (version) => {
-    console.log(`✓ Published ${version.version}`);
-    // Send Slack notification, update docs, etc.
-  },
-  
-  // On error (e.g., rollback, alert)
-  onError: async (error) => {
-    console.error('Publish failed:', error.message);
-    // Send error alert
-  },
-}
-```
-
-## Workflow Example
-
-```bash
-# 1. Make your code changes
-git add .
-git commit -m "Fix critical bug in payment flow"
-
-# 2. Publish OTA update (uses git commit as changelog)
-npm run ota:prod
-
-# Output:
-# 📦 Publishing OTA update to production
-# 
-# ✓ EAS configuration valid
-# Current version: 1.0.0-production.41 (build 41)
-# ✓ Generated changelog (1 items)
-# 
-# 📋 Version Information:
-#   Version:      1.0.0-production.42
-#   Build:        42
-#   Channel:      production
-#   Release Date: 12/7/2025, 2:30:00 PM
-# 
-# 📝 Changelog:
-#   1. Fix critical bug in payment flow
-# 
-# ✓ Updated ota-version.json
-# ✓ Published to EAS
-# 
-# ✨ Successfully published 1.0.0-production.42!
-```
-
----

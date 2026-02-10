@@ -56,7 +56,7 @@ See exactly what's eating your storage — and fix it in seconds
 
 <a href="https://www.photo-trim.com" style="text-decoration: none; font-weight: bold; font-size: 16px;">🌐 Visit photo-trim.com</a>
 &nbsp;&nbsp;·&nbsp;&nbsp;
-<a href="https://apps.apple.com/app/photo-trim" style="text-decoration: none; font-weight: bold; font-size: 16px;">📱 Download on App Store</a>
+<a href="https://apps.apple.com/app/id6755884114" style="text-decoration: none; font-weight: bold; font-size: 16px;">📱 Download on App Store</a>
 
 <br/><br/>
 
@@ -75,6 +75,7 @@ See exactly what's eating your storage — and fix it in seconds
 - 🎨 **Fully Customizable** — Theme colors, gradients, border radius, and animations
 - 🌍 **i18n Ready** — Pass your own translations or use English defaults
 - ✨ **Animated Banner** — Beautiful gradient banner with pulse animation
+- 🧱 **Gradient Fallback** — Uses solid background automatically when `expo-linear-gradient` is not installed
 - 📱 **Info Screen** — Full debug/info screen with changelog display
 - 🔌 **Drop-in Ready** — Works out of the box with sensible defaults
 - 🎯 **Render Props** — Override any component with your own implementation
@@ -85,11 +86,15 @@ See exactly what's eating your storage — and fix it in seconds
 - 🚀 **Easy Publishing** — Simple `ota-publish` command to publish OTA updates
 - ⚙️ **Configurable** — Customize via `ota-updates.config.js`
 - 📊 **Multiple Version Strategies** — Semver, build number, or date-based
-- 📝 **Smart Changelog** — Auto-generate from git, manual input, or file
+- 📝 **Smart Changelog** — Auto-generate from git, manual input, file, or custom hook
+- 🧩 **Per-Channel Templates** — Channel-specific version/message formats
+- ✂️ **Short Channel Aliases** — Use `{channelAlias}` for compact versions like `1.1.6-p42`
 - 🎯 **Interactive Mode** — Guided prompts for easy publishing
 - 🔍 **Dry Run** — Preview changes before publishing
-- 🪝 **Hooks System** — Run custom logic before/after publish
+- 🪝 **Hooks System** — Run custom logic and override changelog/message/version
 - 📦 **Multi-Channel** — Support for dev, preview, production channels
+- ↩️ **Revert Command** — Safely republish a previous update to roll back a channel
+- ⇄ **Promote Command** — Copy an update group from one channel to another
 
 ---
 
@@ -159,7 +164,7 @@ bun add expo expo-updates expo-device react react-native react-native-reanimated
 Optional dependencies for enhanced visuals:
 
 ```bash
-# For gradient banners
+# For gradient banners (optional; falls back to solid View if missing)
 bun add expo-linear-gradient
 
 # For beautiful icons (recommended)
@@ -268,6 +273,36 @@ Add to your `package.json`:
 
 Then run: `npm run ota:dev`, `npm run ota:preview`, or `npm run ota:prod`
 
+### Release Management Commands
+
+```bash
+# Revert a channel to a previous update group (interactive picker)
+npx ota-publish revert --channel production
+
+# Promote from preview to production (interactive picker)
+npx ota-publish promote --from preview --to production
+
+# Safe preview first
+npx ota-publish revert --channel production --dry-run
+npx ota-publish promote --from preview --to production --dry-run
+```
+
+### Shorter Production Version Example
+
+If `1.1.6-production.1` is too long, use channel aliasing:
+
+```js
+// ota-updates.config.mjs
+export default {
+  channelAliases: { production: 'p' },
+  versionFormatByChannel: {
+    production: '{major}.{minor}.{patch}-p{build}',
+  },
+};
+```
+
+Output: `1.1.6-p1`
+
 **📖 [Full CLI Documentation →](./CLI.md)**
 
 ---
@@ -293,6 +328,8 @@ The main provider that enables OTA update functionality throughout your app.
 interface OTAConfig {
   checkOnMount?: boolean;      // Check for updates on mount (default: true)
   checkOnForeground?: boolean; // Check when app comes to foreground (default: true)
+  minCheckIntervalMs?: number; // Throttle checks (default: 0)
+  recordSkippedChecks?: boolean; // Update lastCheck + reason for skipped checks (default: true)
   autoDownload?: boolean;      // Auto-download when available (default: false)
   autoReload?: boolean;        // Auto-reload after download (default: false)
   versionData?: OTAVersionData; // Version info from ota-version.json
@@ -323,6 +360,8 @@ interface OTAConfig {
   config={{
     checkOnMount: true,
     checkOnForeground: true,
+    minCheckIntervalMs: 30000,
+    recordSkippedChecks: true,
     autoDownload: false,
     versionData: require('./ota-version.json'),
   }}
@@ -350,6 +389,7 @@ function MyComponent() {
     checkError,         // Error | null
     downloadError,      // Error | null
     lastCheck,          // Date | null
+    lastSkippedReason,  // string | null (DEV/simulator/throttled/disabled)
     
     // expo-updates Metadata
     currentUpdateId,    // string | null
@@ -364,7 +404,7 @@ function MyComponent() {
     otaChangelog,       // string[]
     
     // Actions
-    checkForUpdate,     // () => Promise<void>
+    checkForUpdate,     // () => Promise<CheckResult>
     downloadUpdate,     // () => Promise<void>
     reloadApp,          // () => Promise<void>
     simulateUpdate,     // () => void - For testing

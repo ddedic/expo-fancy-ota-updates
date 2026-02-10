@@ -39,7 +39,7 @@ bun add expo expo-updates expo-device react react-native react-native-reanimated
 For enhanced visuals:
 
 ```bash
-# For gradient banners
+# For gradient banners (optional; falls back to solid background if missing)
 bun add expo-linear-gradient
 
 # For beautiful icons (recommended)

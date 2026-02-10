@@ -211,7 +211,7 @@ theme={{
 }}
 ```
 
-Requires `expo-linear-gradient`. Falls back to solid color if not installed.
+`expo-linear-gradient` is optional. If not installed, banner uses a solid background fallback automatically.
 
 ### Border Radius
 
