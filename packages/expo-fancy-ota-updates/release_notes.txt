@@ -1,0 +1,15 @@
+## 1.4.1
+
+### ✅ Fixed
+- `OTAInfoScreen` now resolves `currentUpdateId` more reliably by checking both `Updates.updateId` and `Updates.manifest.id`.
+- Update ID presentation in `OTAUpdateInfo` is clearer and more diagnostic:
+  - available IDs show as compact `prefix...suffix`
+  - development builds without exposed IDs now show `N/A (dev build)`
+- Tab-hosted `OTAInfoScreen` no longer lets bottom content get hidden behind tab bars thanks to improved inset and bottom padding behavior.
+
+### 🧭 Navigation Integration Notes
+- When using `OTAInfoScreen` inside native stack/tab navigation, avoid rendering two headers at the same time.
+- For tab routes, prefer a single visible header source:
+  - native stack header OR
+  - `OTAInfoScreen` internal header
+- If you enable native tab-specific features (for example tab bar minimize behavior), gate them by platform/version and keep a fallback for older or unstable environments.
