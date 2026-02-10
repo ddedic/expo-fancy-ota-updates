@@ -6,7 +6,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { 
   FadeInDown, 
   FadeOutUp, 
@@ -20,6 +19,42 @@ import Animated, {
 import { useOTAUpdates } from '../context/OTAUpdatesProvider';
 import { DownloadIcon, CloseIcon } from './Icons';
 import type { UpdateBannerProps } from '../types';
+
+interface GradientWrapperProps {
+  colors: readonly string[];
+  start?: { x: number; y: number };
+  end?: { x: number; y: number };
+  style?: any;
+  children?: React.ReactNode;
+}
+
+const SolidGradientFallback: React.FC<GradientWrapperProps> = ({ colors, style, children }) => {
+  const fallbackColor = colors[0] || '#000000';
+  return <View style={[style, { backgroundColor: fallbackColor }]}>{children}</View>;
+};
+
+let CachedGradientComponent: React.ComponentType<GradientWrapperProps> | null | undefined;
+
+function getGradientComponent(): React.ComponentType<GradientWrapperProps> {
+  if (CachedGradientComponent !== undefined) {
+    return CachedGradientComponent || SolidGradientFallback;
+  }
+
+  try {
+    // Avoid static module resolution so expo-linear-gradient stays truly optional.
+    const dynamicRequire = Function('name', 'return require(name);') as (name: string) => any;
+    const mod = dynamicRequire('expo-linear-gradient');
+    if (mod?.LinearGradient) {
+      CachedGradientComponent = mod.LinearGradient as React.ComponentType<GradientWrapperProps>;
+      return CachedGradientComponent;
+    }
+  } catch {
+    // Fallback to a solid background when optional dependency is not installed.
+  }
+
+  CachedGradientComponent = null;
+  return SolidGradientFallback;
+}
 
 // ============================================================================
 // UpdateBanner Component
@@ -127,6 +162,7 @@ export function UpdateBanner({
 
   // Default banner UI
   const gradientColors = bannerGradient ?? [colors.primary, colors.primaryLight];
+  const GradientComponent = getGradientComponent();
 
   return (
     <Animated.View 
@@ -134,7 +170,7 @@ export function UpdateBanner({
       exiting={FadeOutUp.duration((animation?.duration ?? 300) * 0.66)}
       style={[styles.container, { paddingTop: insets.top }, style]}
     >
-      <LinearGradient
+      <GradientComponent
         colors={gradientColors}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -192,7 +228,7 @@ export function UpdateBanner({
             </TouchableOpacity>
           </View>
         </View>
-      </LinearGradient>
+      </GradientComponent>
     </Animated.View>
   );
 }

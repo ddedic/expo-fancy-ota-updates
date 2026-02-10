@@ -165,6 +165,10 @@ export interface OTAConfig {
   checkOnMount?: boolean;
   /** Check for updates when app comes to foreground (default: true) */
   checkOnForeground?: boolean;
+  /** Minimum interval between checks in milliseconds (default: 0 = no throttling) */
+  minCheckIntervalMs?: number;
+  /** Record skipped checks by updating lastCheck and lastSkippedReason (default: true) */
+  recordSkippedChecks?: boolean;
   /** Automatically download updates when available (default: false) */
   autoDownload?: boolean;
   /** Automatically reload when update is downloaded (default: false) */
@@ -188,6 +192,8 @@ export interface OTAUpdatesContextValue {
   checkError: Error | null;
   downloadError: Error | null;
   lastCheck: Date | null;
+  /** Most recent skip reason from checkForUpdate (DEV/simulator/throttle/disabled), otherwise null */
+  lastSkippedReason: string | null;
   /** True when showing a simulated update banner (for testing) */
   isSimulating: boolean;
   
@@ -258,6 +264,7 @@ export interface RenderInfoProps {
   theme: OTATheme;
   translations: OTATranslations;
   status: UpdateStatus;
+  lastSkippedReason?: string | null;
   isEmbeddedUpdate: boolean;
   runtimeVersion: string | null;
   otaVersion: string;

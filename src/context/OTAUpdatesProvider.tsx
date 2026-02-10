@@ -3,7 +3,7 @@
  * OTA Updates Context Provider
  */
 
-import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import * as Updates from 'expo-updates';
 import * as Device from 'expo-device';
 import { AppState, AppStateStatus } from 'react-native';
@@ -41,6 +41,8 @@ export function OTAUpdatesProvider({
   const {
     checkOnMount = true,
     checkOnForeground = true,
+    minCheckIntervalMs = 0,
+    recordSkippedChecks = true,
     autoDownload = false,
     autoReload = false,
     versionData = defaultVersionData,
@@ -56,8 +58,10 @@ export function OTAUpdatesProvider({
   const [checkError, setCheckError] = useState<Error | null>(null);
   const [downloadError, setDownloadError] = useState<Error | null>(null);
   const [lastCheck, setLastCheck] = useState<Date | null>(null);
+  const [lastSkippedReason, setLastSkippedReason] = useState<string | null>(null);
   const [isUpdateAvailable, setIsUpdateAvailable] = useState(false);
   const [isSimulating, setIsSimulating] = useState(false);
+  const lastCheckRef = useRef<Date | null>(null);
 
   // Debug logger
   const log = useCallback((message: string, ...args: unknown[]) => {
@@ -66,6 +70,28 @@ export function OTAUpdatesProvider({
     }
   }, [debug]);
 
+  const canCheckNow = useCallback((): { allowed: boolean; reason?: string } => {
+    if (minCheckIntervalMs <= 0 || !lastCheckRef.current) {
+      return { allowed: true };
+    }
+
+    const elapsed = Date.now() - lastCheckRef.current.getTime();
+    if (elapsed < minCheckIntervalMs) {
+      const remaining = minCheckIntervalMs - elapsed;
+      return { allowed: false, reason: `Throttled (${remaining}ms remaining)` };
+    }
+
+    return { allowed: true };
+  }, [minCheckIntervalMs]);
+
+  const recordSkippedResult = useCallback((reason: string): CheckResult => {
+    setLastSkippedReason(reason);
+    if (recordSkippedChecks) {
+      setLastCheck(new Date());
+    }
+    return { isAvailable: false, status: 'idle', isSkipped: true, reason };
+  }, [recordSkippedChecks]);
+
   // ============================================================================
   // Actions
   // ============================================================================
@@ -73,21 +99,35 @@ export function OTAUpdatesProvider({
   const checkForUpdate = useCallback(async (): Promise<CheckResult> => {
     if (__DEV__) {
       log('Skipping update check in DEV mode');
-      return { isAvailable: false, status: 'idle', isSkipped: true, reason: 'DEV mode' };
+      return recordSkippedResult('DEV mode');
     }
 
     if (!Device.isDevice) {
       log('Skipping update check in simulator mode');
-      return { isAvailable: false, status: 'idle', isSkipped: true, reason: 'Simulator mode' };
+      return recordSkippedResult('Simulator mode');
+    }
+
+    if (!Updates.isEnabled) {
+      log('Skipping update check: Updates.isEnabled is false');
+      return recordSkippedResult('Updates disabled');
+    }
+
+    const throttleResult = canCheckNow();
+    if (!throttleResult.allowed) {
+      log(`Skipping update check: ${throttleResult.reason}`);
+      return recordSkippedResult(throttleResult.reason || 'Throttled');
     }
 
     try {
       setStatus('checking');
       setCheckError(null);
+      setLastSkippedReason(null);
       log('Checking for updates...');
       
       const update = await Updates.checkForUpdateAsync();
-      setLastCheck(new Date());
+      const now = new Date();
+      setLastCheck(now);
+      lastCheckRef.current = now;
 
       if (update.isAvailable) {
         log('Update available!');
@@ -111,7 +151,7 @@ export function OTAUpdatesProvider({
       setStatus('error');
       return { isAvailable: false, status: 'error', error: error as Error };
     }
-  }, [autoDownload, log]);
+  }, [autoDownload, canCheckNow, log, recordSkippedResult]);
 
   const downloadUpdate = useCallback(async () => {
     if (__DEV__) {
@@ -121,6 +161,11 @@ export function OTAUpdatesProvider({
 
     if (!Device.isDevice) {
       log('Skipping update download in simulator mode');
+      return;
+    }
+
+    if (!Updates.isEnabled) {
+      log('Skipping update download: Updates.isEnabled is false');
       return;
     }
 
@@ -217,6 +262,7 @@ export function OTAUpdatesProvider({
     checkError,
     downloadError,
     lastCheck,
+    lastSkippedReason,
     isSimulating,
     
     // expo-updates metadata
@@ -247,6 +293,7 @@ export function OTAUpdatesProvider({
     checkError,
     downloadError,
     lastCheck,
+    lastSkippedReason,
     isSimulating,
     versionData,
     checkForUpdate,

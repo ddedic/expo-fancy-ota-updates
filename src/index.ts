@@ -25,4 +25,14 @@ export type {
 export { defaultTheme, lightTheme, defaultTranslations } from './defaults';
 
 // Export CLI types (for config files)
-export type { OTAConfig } from './cli/schema';
+export type {
+  OTAConfig,
+  OTAHooks,
+  BeforePublishContext,
+  BeforePublishResult,
+  AfterPublishContext,
+  ErrorContext,
+  CustomVersionContext,
+  CustomChangelogContext,
+  VersionTemplateVariables,
+} from './cli/schema';

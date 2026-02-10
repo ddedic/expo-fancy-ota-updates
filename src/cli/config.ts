@@ -83,9 +83,21 @@ export default {
   
   // Version format template
   versionFormat: '{major}.{minor}.{patch}-{channel}.{build}',
+
+  // Optional per-channel version templates
+  // versionFormatByChannel: {
+  //   production: '{major}.{minor}.{patch}-p{build}',
+  // },
   
   // Version strategy: 'semver' | 'build' | 'date' | 'custom'
   versionStrategy: 'build',
+
+  // Optional aliases used by {channelAlias}
+  // channelAliases: {
+  //   development: 'd',
+  //   preview: 'pr',
+  //   production: 'p',
+  // },
   
   // Changelog configuration
   changelog: {
@@ -99,6 +111,10 @@ export default {
   eas: {
     autoPublish: true,
     messageFormat: 'v{version}: {firstChange}',
+    // Optional per-channel message templates
+    // messageFormatByChannel: {
+    //   production: 'release {version} ({channelAlias})',
+    // },
   },
   
   // Available channels
@@ -107,14 +123,26 @@ export default {
   
   // Hooks (optional)
   // hooks: {
-  //   beforePublish: async (version) => {
-  //     console.log(\`Publishing \${version.version}...\`);
+  //   beforePublish: async ({ changelog }) => {
+  //     // Can return changelog/message/version overrides
+  //     return {
+  //       changelog,
+  //       message: \`Deploying with \${changelog.length} changes\`,
+  //     };
   //   },
-  //   afterPublish: async (version) => {
-  //     console.log(\`Published \${version.version}\`);
+  //   generateVersion: async ({ defaultVersion, templateVars }) => {
+  //     // Used when versionStrategy: 'custom'
+  //     return \`\${defaultVersion}-sha.\${templateVars.build}\`;
   //   },
-  //   onError: async (error) => {
-  //     console.error('Publish failed:', error);
+  //   generateChangelog: async () => {
+  //     // Used when changelog.source: 'custom'
+  //     return ['Custom release note'];
+  //   },
+  //   afterPublish: async (version, context) => {
+  //     console.log(\`Published \${version.version} to \${context.channel}\`);
+  //   },
+  //   onError: async (error, context) => {
+  //     console.error(\`Publish failed in \${context.cwd}:\`, error);
   //   },
   // },
 };
