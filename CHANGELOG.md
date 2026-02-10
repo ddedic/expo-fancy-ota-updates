@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-02-10
+
+### Added
+- Added `ota-publish revert` command to rollback a channel by republishing a previous update group.
+- Added `ota-publish promote` command to copy update groups between channels (e.g. `preview -> production`).
+- Added strict safety defaults for release-management commands:
+  - interactive group selection when `--group` is not provided
+  - confirmation prompts by default
+  - `--dry-run` preview support
+  - `--yes` override to skip confirmation
+- Added runtime metadata field `lastSkippedReason` to `useOTAUpdates()` context.
+- Added provider config `recordSkippedChecks` to control skipped-check metadata recording.
+
+### Changed
+- `checkForUpdate()` now records skipped checks more predictably (optional `lastCheck` update + skip reason) without breaking status semantics.
+- `UpdateBanner` now works without `expo-linear-gradient` by using an automatic solid `View` fallback.
+- Updated docs and examples for new commands, skipped-check behavior, and gradient fallback.
+- Updated Photo Trim App Store link to `https://apps.apple.com/app/id6755884114`.
+
+## [1.3.0] - 2026-02-10
+
+### Added
+- Implemented real `versionStrategy: "custom"` with `hooks.generateVersion`.
+- Implemented real `changelog.source: "custom"` with `hooks.generateChangelog`.
+- Added channel-aware template options:
+  - `versionFormatByChannel`
+  - `eas.messageFormatByChannel`
+  - `channelAliases` with `{channelAlias}` placeholder support.
+- Added CLI one-off overrides:
+  - `--strategy`
+  - `--version-format`
+  - repeatable `--platform`.
+- Added `beforePublish` override return support for `changelog`, `message`, and `version`.
+- Added typed CLI hook/context exports:
+  - `OTAHooks`, `BeforePublishContext`, `BeforePublishResult`, `AfterPublishContext`, `ErrorContext`, `CustomVersionContext`, `CustomChangelogContext`, `VersionTemplateVariables`.
+- Added provider config `minCheckIntervalMs` for throttled update checks.
+
+### Changed
+- Replaced single-token string replacement with template rendering that handles repeated placeholders safely.
+- Resolved `changelog.filePath` relative to project/config cwd.
+- Strengthened CLI config validation (channel map keys, `defaultChannel`, `filePath` requirement, `custom` hook requirements).
+- Expanded `ota-publish init` template to include dynamic versioning/changelog examples.
+- Updated docs and CLI references across `/docs`, `README.md`, and `CLI.md`.
+
 ## [1.2.1] - 2025-12-08
 
 ### Added

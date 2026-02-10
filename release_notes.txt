@@ -1,13 +1,16 @@
 ## Added
-- **Enhanced Render Props**: `renderInfo`, `renderActions`, and `renderChangelog` now receive comprehensive prop objects (`RenderInfoProps`, `RenderActionsProps`, etc.) containing all necessary state and callbacks (e.g., `checkForUpdate`, `status`, `otaVersion`).
-- **Controlled Components**: `OTAUpdateInfo`, `OTAUpdateActions`, and `OTAUpdateChangelog` now accept partial props to override context values, enabling full customization.
-- **Refactored Architecture**: Split `OTAInfoScreen` into modular, exported sub-components (`OTAUpdateInfo`, `OTAUpdateActions`, `OTAUpdateChangelog`).
+- `ota-publish revert` to roll back a channel to a previous update group.
+- `ota-publish promote` to copy an update group between channels (`preview -> production`).
+- Safe-by-default release management UX:
+  - interactive group selection when no `--group` is provided
+  - confirmation prompts by default
+  - `--dry-run` previews
+  - `--yes` bypass flag for automation
+- `lastSkippedReason` in `useOTAUpdates()` context.
+- `recordSkippedChecks` provider config option.
 
 ## Changed
-- **Documentation**: Added detailed "Customization" guide to `info-screen.md` with examples for custom components and render props.
-- **Documentation**: Added Changelog to the official documentation site.
-- **Documentation**: Optimized screenshot size in docs for better readability.
-
-## Fixed
-- **Types**: Exported `RenderInfoProps`, `RenderActionsProps`, `RenderChangelogProps` from main package.
-- **Cleanup**: Refactored monolithic `OTAInfoScreen.tsx` into smaller, maintainable files.
+- Skipped update checks now optionally update metadata (`lastCheck`) and expose reason consistently.
+- `UpdateBanner` no longer requires `expo-linear-gradient`; it falls back to a solid `View` background automatically.
+- Updated docs for revert/promote commands, skip metadata behavior, and gradient fallback behavior.
+- Updated Photo Trim App Store link to `https://apps.apple.com/app/id6755884114`.
