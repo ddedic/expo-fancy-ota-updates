@@ -44,3 +44,4 @@ pnpm-debug.log*
 package-lock.json
 yarn.lock
 bun.lock
+MARKETING.md
