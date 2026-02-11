@@ -34,7 +34,7 @@
     "dist",
     "bin",
     "src",
-    "assets",
+    "assets/photo-trim-icon.png",
     "README.md",
     "CLI.md",
     "CHANGELOG.md",
