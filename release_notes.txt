@@ -1,0 +1,21 @@
+## 1.5.0
+
+### Runtime Channel Switching ("Channel Surfing")
+- Added `switchChannel(channel)` to `useOTAUpdates()` hook — lets production apps switch which update channel they pull from at runtime.
+- Uses Expo SDK 54's `Updates.setUpdateRequestHeadersOverride()` under the hood.
+- Added `isSwitchingChannel` boolean state for tracking switch-in-progress.
+- Added `SwitchChannelResult` type export for typed responses.
+- Same guard pattern as `checkForUpdate`: skips gracefully in DEV mode, simulators, and when updates are disabled.
+- Perfect for QA/stakeholders previewing staging or preview channel updates without rebuilding.
+
+### Demo App
+- Added "Channel surfing" section to the controls screen with interactive channel buttons (production/staging/preview).
+- Shows current channel, loading state, and skip alerts in DEV mode.
+
+### Docs & Cleanup
+- Updated VitePress docs with channel switching API reference and examples.
+- Fixed install commands across README and docs (were all showing `pnpm`).
+- Fixed sidebar link in VitePress config (apps/ → examples/).
+- Updated copyright year to 2025-2026.
+- Updated SDK requirement to Expo SDK 54+.
+- Removed completed items from "Planned" section in changelog.

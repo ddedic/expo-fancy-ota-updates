@@ -3,24 +3,27 @@ node_modules/
 **/node_modules/
 .pnpm-store/
 
-# Monorepo / build caches
-.turbo/
+# Build output
 dist/
 **/dist/
 coverage/
 **/coverage/
 *.tsbuildinfo
 
+# VitePress
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+
 # Expo / React Native generated artifacts
 .expo/
 .expo-shared/
 web-build/
-apps/*/.expo/
-apps/*/.expo-shared/
-apps/*/web-build/
-apps/*/android/
-apps/*/ios/
-apps/*/.metro-health-check*
+examples/*/.expo/
+examples/*/.expo-shared/
+examples/*/web-build/
+examples/*/android/
+examples/*/ios/
+examples/*/.metro-health-check*
 
 # Local environment files
 .env
