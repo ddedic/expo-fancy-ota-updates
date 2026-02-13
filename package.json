@@ -45,6 +45,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "prepublishOnly": "bun run build",
     "example": "pnpm --dir examples/demo start --clear",
     "docs:dev": "vitepress dev docs",
@@ -92,6 +93,7 @@
     "tsup": "^8.5.1",
     "typescript": "~5.7.2",
     "vitepress": "^1.6.4",
+    "vitest": "^3.2.4",
     "vue": "^3.5.25"
   },
   "publishConfig": {
